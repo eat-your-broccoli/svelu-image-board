@@ -1,0 +1,45 @@
+version: "3.6"
+version: '3.6'
+networks:
+  internal:
+    external: false
+  proxy:
+    external: true
+services:
+  mysql:
+    container_name: ${MYSQL_CONTAINER_NAME}
+    image: mysql
+    cap_add:
+      - SYS_NICE #CAP_SYS_NICE
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - ${MYSQL_PORT}:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWD}
+    networks:
+      - db
+  phpmyadmin:
+    container_name: ${PHPMYADMIN_CONTAINER_NAME}
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - ${PHPMYADMIN_PORT}:80
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWD}
+      - PMA_HOST=${MYSQL_CONTAINER_NAME}
+      - PMA_PORT=${MYSQL_PORT}
+    networks:
+      - db
+      
+networks:
+  db:
+    external: false
+volumes:
+  db-data:
+    name: svelu-mysql-test-db
+
