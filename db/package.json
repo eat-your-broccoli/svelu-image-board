@@ -9,13 +9,17 @@
     "umzug": "^3.1.1"
   },
   "devDependencies": {
+    "@tsconfig/recommended": "^1.0.1",
+    "@types/sequelize": "^4.28.13",
+    "@types/umzug": "^2.3.3",
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
     "eslint": "^8.15.0",
     "typescript": "^4.6.4"
   },
   "scripts": {
-    "test": ""
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "keywords": [
     "aws",
