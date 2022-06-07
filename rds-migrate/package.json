@@ -10,6 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.1149.0",
-    "aws-xray-sdk-core": "^3.3.6"
+    "aws-xray-sdk-core": "^3.3.6",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.19.2",
+    "umzug": "^3.1.1"
   }
 }

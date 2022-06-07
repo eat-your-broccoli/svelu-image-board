@@ -1,5 +1,6 @@
 const AWSXRay = require('aws-xray-sdk-core');
 const AWSSDK = require('aws-sdk');
+const { loadUmzug } = require('./loadUmzug');
 const AWS = AWSXRay.captureAWS(AWSSDK)
 
 // Create client outside of handler to reuse
@@ -7,19 +8,18 @@ const lambda = new AWS.Lambda()
 
 // Handler
 exports.handler = async function(event, context) {
-  console.log('## ENVIRONMENT VARIABLES: ' + serialize(process.env))
-  console.log('## CONTEXT: ' + serialize(context))
-  console.log('## EVENT: ' + serialize(event))
+  const params = {};
+  params.dbName = process.env.DB_NAME;
+  params.password = process.env.DB_PASS;
+  params.username = process.env.DB_USER;
+  params.dbPort = process.env.DB_PORT;
+  params.dbHost = process.env.DB_HOST;
   
-  return getAccountSettings()
-}
+  console.log({params})
 
-// Use SDK client
-function getAccountSettings(){
-  return lambda.getAccountSettings().promise()
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function serialize (object) {
-  return JSON.stringify(object, null, 2)
+  const umzug = await loadUmzug(params);
+  return new Promise(async resolve => {
+    await umzug.up();
+    resolve(true);
+  })
 }
