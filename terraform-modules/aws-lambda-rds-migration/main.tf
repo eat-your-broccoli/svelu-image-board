@@ -37,6 +37,11 @@ resource "aws_lambda_function" "lambda_rds_migration" {
       DB_HOST = var.env_db_address
     }
   }
+
+  vpc_config {
+    security_group_ids = [var.vpc_security_group_default_id]
+    subnet_ids  = var.aws_subnet_rds_ids
+  }
 }
 
 resource "aws_iam_role" "lambda_exec" {

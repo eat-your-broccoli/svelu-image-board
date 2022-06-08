@@ -28,6 +28,3 @@ output "rds_name" {
   sensitive   = true
 }
 
-
-
-

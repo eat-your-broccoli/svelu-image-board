@@ -48,8 +48,15 @@ variable "env_db_port" {
   type = string
 }
 
+variable "rds_vpc_id" {
+  description = "rds vpc id"
+  type = string
+}
 
-
+variable "aws_db_subnet_group_default_id" {}
+variable "aws_subnet_rds_ids" {}
+variable "aws_security_group_rds_id" {}
+variable "vpc_security_group_default_id" {}
 
 
 

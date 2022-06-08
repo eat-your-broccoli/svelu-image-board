@@ -19,8 +19,12 @@ provider "aws" {
   region  = "eu-central-1"
 }
 
+module "vpc" {
+  source = "./terraform-modules/aws-vpc-rds"
+}
 
-## S3 bucket for our website
+
+# ## S3 bucket for our website
 module "website_bucket_s3" {
   source = "./terraform-modules/aws-s3-website-bucket"
 
@@ -35,13 +39,20 @@ module "website_bucket_s3" {
 
 # relational database service (storing posts, tags, comments)
 module "rds" {
+  depends_on = [
+    module.vpc
+  ]
  source = "./terraform-modules/aws-rds"
  rds_name = "myRDS"
  rds_user = "root"
  rds_password = "myTotallySecure36423674534723P4w0rdddd"
+ rds_vpc_id = module.vpc.vpc_id
+ vpc_security_group_default_id = module.vpc.vpc_security_group_default_id
+  aws_db_subnet_group_default_id = module.vpc.aws_db_subnet_group_default_id
+  aws_security_group_rds_id = module.vpc.aws_security_group_rds_id
 }
 
-### Lambda functions
+# ### Lambda functions
 
 resource "aws_s3_bucket" "lambda_bucket" {
   bucket = "bucket-lambda-rds-migration"
@@ -52,7 +63,8 @@ resource "aws_s3_bucket" "lambda_bucket" {
 #### lambda function for rds migrations
 module "lambda_rds_migration" {
   depends_on = [
-    module.rds
+    module.rds,
+    module.vpc
   ]
 
   source      = "./terraform-modules/aws-lambda-rds-migration"
@@ -68,6 +80,10 @@ module "lambda_rds_migration" {
 
   env_db_address = "${module.rds.rds_address}"
   env_db_port =  "${module.rds.rds_port}"
-  
 
+  rds_vpc_id = module.vpc.vpc_id
+  aws_db_subnet_group_default_id = module.vpc.aws_db_subnet_group_default_id
+  aws_subnet_rds_ids = module.vpc.aws_subnet_rds_ids
+  aws_security_group_rds_id = module.vpc.aws_security_group_rds_id
+  vpc_security_group_default_id = module.vpc.vpc_security_group_default_id
 }

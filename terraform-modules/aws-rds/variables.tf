@@ -13,3 +13,15 @@ variable "rds_password"{
     type = string
 }
 
+variable "rds_vpc_id" {
+  description = "id of vpc"
+  sensitive   = true
+}
+
+variable "vpc_security_group_default_id" {
+  description = "id of vpc"
+  sensitive   = true
+}
+
+variable "aws_db_subnet_group_default_id" {}
+variable "aws_security_group_rds_id" {}
