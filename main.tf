@@ -96,3 +96,7 @@ module "lambda_rds_migration_invocation" {
   source = "./terraform-modules/aws-lambda-rds-migration-invocation"
   lambda_func_name = module.lambda_rds_migration.lambda_func_name
 }
+
+module "cognito" {
+  source = "./terraform-modules/aws-cognito"
+}
