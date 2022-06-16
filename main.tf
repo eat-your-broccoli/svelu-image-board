@@ -87,3 +87,12 @@ module "lambda_rds_migration" {
   aws_security_group_rds_id = module.vpc.aws_security_group_rds_id
   vpc_security_group_default_id = module.vpc.vpc_security_group_default_id
 }
+
+
+module "lambda_rds_migration_invocation" {
+  depends_on = [
+    module.lambda_rds_migration
+  ]
+  source = "./terraform-modules/aws-lambda-rds-migration-invocation"
+  lambda_func_name = module.lambda_rds_migration.lambda_func_name
+}

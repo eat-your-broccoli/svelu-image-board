@@ -2,3 +2,7 @@
 #   description = "Domain name of the bucket"
 #   value       = module.website_bucket_s3
 # }
+
+output "lambda_migration_success" {
+    value = module.lambda_rds_migration_invocation.lambda_migration_result
+}
