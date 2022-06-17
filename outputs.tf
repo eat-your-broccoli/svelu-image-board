@@ -6,3 +6,7 @@
 output "lambda_migration_success" {
     value = module.lambda_rds_migration_invocation.lambda_migration_result
 }
+
+output "cognito_domain" {
+    value = module.cognito.cognito_domain
+}
