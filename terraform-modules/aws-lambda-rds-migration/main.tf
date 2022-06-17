@@ -10,7 +10,7 @@ resource "aws_s3_bucket_object" "lambda_rds_migration" {
   key    = var.file_key
   source = data.archive_file.lambda_rds_migration.output_path
 
-  etag = filemd5(data.archive_file.lambda_rds_migration.output_path)
+  etag = data.archive_file.lambda_rds_migration.output_md5
 }
 
 resource "aws_lambda_function" "lambda_rds_migration" {

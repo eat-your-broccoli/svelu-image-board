@@ -19,7 +19,7 @@ resource "aws_cognito_user_pool_client" "client" {
   explicit_auth_flows = [
     "ALLOW_REFRESH_TOKEN_AUTH",
     "ALLOW_USER_PASSWORD_AUTH",
-    "ALLOW_ADMIN_USER_PASSWORD_AUTH"
+    "ALLOW_USER_SRP_AUTH"
   ]
   supported_identity_providers         = ["COGNITO"]
 }
@@ -44,4 +44,15 @@ resource "aws_cognito_user" "test-user" {
 resource "aws_cognito_user_pool_domain" "main" {
   domain       = "svelu-auth"
   user_pool_id = aws_cognito_user_pool.user_pool.id
+}
+
+# some info (user pool id, user client id) is relevant for the frontend, the aws sdk needs these to make auth calls
+# so we take them and put them in a json file in the frontend project
+resource "local_file" "cognito_config" {
+  depends_on = [
+    aws_cognito_user_pool.user_pool,
+    aws_cognito_user_pool_client.client
+  ]
+  content  = "{\n\"UserPoolId\": \"${aws_cognito_user_pool.user_pool.id}\", \n\"ClientId\": \"${aws_cognito_user_pool_client.client.id}\"\n}"
+  filename = "./cloud-computing-app/src/config/cognito.config.json"
 }
