@@ -31,7 +31,11 @@ override.tf.json
 
 # Ignore CLI configuration files
 .terraformrc
+<<<<<<< HEAD
 terraform.rc
 
 #zipped files ready for shipping
 terraform-modules/**/*.zip
+=======
+terraform.rc
+>>>>>>> origin/HTMLJsTEst
