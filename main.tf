@@ -126,7 +126,6 @@ module lambda_api {
       timeout = 7
       handler = "createUser.handler"
     }
-    
   }
 
   env_db_name = "${module.rds.rds_name}"
@@ -141,6 +140,41 @@ module lambda_api {
   aws_subnet_rds_ids = module.vpc.aws_subnet_rds_ids
   aws_security_group_rds_id = module.vpc.aws_security_group_rds_id
   vpc_security_group_default_id = module.vpc.vpc_security_group_default_id
+}
+
+module "api_gateway" {
+  depends_on = [
+    module.lambda_api
+  ]
+
+  source = "./terraform-modules/aws-api-gateway"
+  api_gateways = {
+    GetPosts = {
+      route_key = "GET /posts"
+      integration_uri = lookup(module.lambda_api.arn, "GetPosts")
+      function_name = lookup(module.lambda_api.function_name, "GetPosts")
+    }
+    CreatePost = {
+      route_key = "POST /post"
+      integration_uri = lookup(module.lambda_api.arn, "CreatePost")
+      function_name = lookup(module.lambda_api.function_name, "CreatePost")
+    }
+    CreateUser = {
+      route_key = "POST /user"
+      integration_uri = lookup(module.lambda_api.arn, "CreateUser")
+      function_name = lookup(module.lambda_api.function_name, "CreateUser")
+    }
+    GetCommentsForPost = {
+      route_key = "GET /post/:post/comments"
+      integration_uri = lookup(module.lambda_api.arn, "GetCommentsForPost")
+      function_name = lookup(module.lambda_api.function_name, "GetCommentsForPost")
+    }
+    CreateComment = {
+      route_key = "POST /post/:post/comment"
+      integration_uri = lookup(module.lambda_api.arn, "CreateComment")
+      function_name = lookup(module.lambda_api.function_name, "CreateComment")
+    }
+  }
 }
 
 

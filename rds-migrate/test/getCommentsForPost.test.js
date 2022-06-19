@@ -8,6 +8,7 @@ const {handler: getCommentsForPost} =require('../getCommentsForPost');
 
 
 const { deleteUserByName, deleteUser } = require('../helpers/deleteUser');
+const { extractBody } = require('../helpers/extractBody');
 
 let user;
 let otherUser;
@@ -20,28 +21,32 @@ before(async () => {
   await deleteUserByName(usernameOther);
     
   let response = await createUser({username});
-  user = response.user;
+  user = extractBody(response).user;
   response = await createUser({username: usernameOther});
   otherUser = response.user;
+  response = await createUser({username: usernameOther});
+  otherUser = extractBody(response).user;
 })
 
 describe('getCommentsForPost', function () {
   describe('gets comments for post', function () {
     it('should return list of comments', async function () {
-      const {post} = await createPost({
+      let post = await createPost({
         user: user.id,
         title: "My title"
       });
+      post = extractBody(post).post;
 
-      const {comment: c1} = await createComment({post: post.id, content: "Hi there 1", user: user.id}, {});
-      const {comment: c2} = await createComment({post: post.id, content: "Hi there 2 from other user", user: otherUser.id}, {});
-      const {comment: c3} = await createComment({post: post.id, content: "Hi there 3 from other user", user: otherUser.id}, {});
-      
-      const response = await getCommentsForPost({post:post.id});
+      const c1 = await createComment({post: post.id, content: "Hi there 1", user: user.id}, {});
+      const c2 = await createComment({post: post.id, content: "Hi there 2 from other user", user: otherUser.id}, {});
+      let c3 = await createComment({post: post.id, content: "Hi there 3 from other user", user: otherUser.id}, {});
+      c3 = extractBody(c3).comment;
+      let response = await getCommentsForPost({post:post.id});
+      response = extractBody(response);
       assert.equal(response.post, post.id);
       assert.equal(response.comments.length, 3);
-      assert.equal(response.comments.find(c => c.id === c3.id).content, c3.content);
-      assert.equal(response.comments.find(c => c.id === c3.id).User.username, otherUser.username);
+      assert.equal(response.comments.find(c => c.id === c3.id).content, "Hi there 3 from other user");
+      assert.equal(response.comments.find(c => c.id === c3.id).User.username, usernameOther);
     });
   });
 });

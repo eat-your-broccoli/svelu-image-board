@@ -5,6 +5,8 @@ const { loadSequelize } = require('./loadUmzug');
 const AWS = AWSXRay.captureAWS(AWSSDK);
 const StatusCodes = require('./StatusCodes');
 
+const {stringifyBody} = require('./helpers/stringifyBody');
+
 // Create client outside of handler to reuse
 const lambda = new AWS.Lambda()
 
@@ -33,16 +35,16 @@ exports.handler = async function(event, context) {
     
     const response = {
       statusCode: StatusCodes.CREATED,
-      user: {
-        id: user.id,
-        username: user.username
-      }
+      body: {
+        user: {
+          id: user.id,
+          username: user.username
+        } 
+      } 
     }
-    return response;
+    return stringifyBody(response);
   } catch(err) {
     console.error({err});
-    return {
-      statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR
-    }
+    return stringifyBody(error2response(err));
   }
 }

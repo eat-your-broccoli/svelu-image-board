@@ -10,6 +10,7 @@ const {handler: getPosts} =require('../getPosts');
 
 const { deleteUserByName, deleteUser } = require('../helpers/deleteUser');
 const { getHeapCodeStatistics } = require('v8');
+const { extractBody } = require('../helpers/extractBody');
 
 let user;
 
@@ -20,7 +21,7 @@ beforeEach(async () => {
   await deleteUserByName(username);
     
   let response = await createUser({username});
-  user = response.user;
+  user = extractBody(response).user;
 })
 
 describe('getPosts', function () {
@@ -38,7 +39,8 @@ describe('getPosts', function () {
       const event = {
         pageSize: 10
       }
-      const response = await getPosts(event, {});
+      let response = await getPosts(event, {});
+      response = extractBody(response);
       assert.equal(response.posts.length, 10);
       assert.equal(response.posts[0].User.id, user.id);
     });
@@ -53,6 +55,7 @@ describe('getPosts', function () {
         posts.push(promise);
       }
       posts = await Promise.all(posts);
+      posts = posts.map(p => extractBody(p));
       const ids = posts.map(p => p.post.id);
       const maxId = Math.max(...ids);
   
@@ -61,7 +64,8 @@ describe('getPosts', function () {
         pageSize: 10,
         lastId // offset by 5
       }
-      const response = await getPosts(event, {});
+      let response = await getPosts(event, {});
+      response = extractBody(response);
       const idsFiltered = response.posts.map(p => p.id);
       const maxFilteredId = Math.max(...idsFiltered);
       assert.equal(maxFilteredId < lastId, true );

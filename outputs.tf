@@ -10,3 +10,7 @@ output "lambda_migration_success" {
 output "cognito_domain" {
     value = module.cognito.cognito_domain
 }
+
+output "api_gateway_url" {
+    value = module.api_gateway.url
+}

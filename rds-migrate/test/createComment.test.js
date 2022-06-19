@@ -7,27 +7,28 @@ const { deleteCommentByUser } = require('../helpers/deleteComment');
 const { deleteUser, deleteUserByName } = require('../helpers/deleteUser');
 
 const {handler: createPost} =require('../createPost');
+const { extractBody } = require('../helpers/extractBody');
 let user;
 const username = "test-user-comment";
 
 before(async () => {
     await deleteUserByName(username);
     const response = await createUser({username});
-    user = response.user;
+    user = extractBody(response).user;
 })
 
 describe('createComment', function () {
   describe('creates a comment', function () {
     it('should return the id of the comment that was created', async function () {
-      const {post} = await createPost({
+      let post = await createPost({
           user: user.id,
           thumbnail: null,
           url: null,
           title: "My title"
-      })
+      });
+        post = extractBody(post).post;
         const event = {post: post.id, content: "Hi there", user: user.id};
-        const response = await createComment.handler(event, {});
-        assert.equal(response.statusCode, 201);
+        const response = extractBody(await createComment.handler(event, {}));
         assert.equal((response.comment.id != null || response.comment.id === 0), true);
     });
   });
