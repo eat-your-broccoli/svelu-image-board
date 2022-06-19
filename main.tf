@@ -88,6 +88,61 @@ module "lambda_rds_migration" {
   vpc_security_group_default_id = module.vpc.vpc_security_group_default_id
 }
 
+module lambda_api {
+  depends_on = [
+    module.rds,
+    module.vpc
+  ]
+
+  source      = "./terraform-modules/aws-lambdas"
+  bucket_id = aws_s3_bucket.lambda_bucket.id
+  src_path    = "./rds-migrate"
+  out_path    = "./terraform-modules/aws-lambdas/api/lambdas-api.zip"
+  file_key    = "lambdas-api.zip"
+
+  lambdas = {
+    GetPosts = {
+      function_name = "GetPosts"
+      timeout = 7
+      handler =  "getPosts.handler"
+    }
+    CreatePost = {
+      function_name = "CreatePost"
+      timeout = 7
+      handler = "createPost.handler"
+    }
+    GetCommentsForPost = {
+      function_name = "GetCommentsForPost"
+      timeout = 7
+      handler =  "getCommentsForPost.handler"
+    }
+    CreateComment = {
+      function_name = "CreateComment"
+      timeout = 7
+      handler = "createComment.handler"
+    }
+    CreateUser = {
+      function_name = "CreateUser"
+      timeout = 7
+      handler = "createUser.handler"
+    }
+    
+  }
+
+  env_db_name = "${module.rds.rds_name}"
+  env_db_pass = "${module.rds.rds_password}"
+  env_db_user = "${module.rds.rds_user}"
+
+  env_db_address = "${module.rds.rds_address}"
+  env_db_port =  "${module.rds.rds_port}"
+
+  rds_vpc_id = module.vpc.vpc_id
+  aws_db_subnet_group_default_id = module.vpc.aws_db_subnet_group_default_id
+  aws_subnet_rds_ids = module.vpc.aws_subnet_rds_ids
+  aws_security_group_rds_id = module.vpc.aws_security_group_rds_id
+  vpc_security_group_default_id = module.vpc.vpc_security_group_default_id
+}
+
 
 module "lambda_rds_migration_invocation" {
   depends_on = [
