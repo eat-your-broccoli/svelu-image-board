@@ -36,3 +36,6 @@ terraform.rc
 #zipped files ready for shipping
 terraform-modules/**/*.zip
 terraform.rc
+
+# todo files
+todo.md
