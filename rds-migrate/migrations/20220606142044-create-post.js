@@ -14,7 +14,18 @@ module.exports = {
           model: 'Users',
           key: 'id',
           as: 'userId'
-        }
+        },
+        onDelete: 'CASCADE' 
+      },
+      url: {
+        type: Sequelize.STRING
+      },
+      thumbnail: {
+        type: Sequelize.STRING
+      },
+      title: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

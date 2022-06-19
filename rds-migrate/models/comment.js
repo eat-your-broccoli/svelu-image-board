@@ -15,6 +15,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'user',
         onDelete: 'CASCADE'
       });
+      Comment.belongsTo(models.Post, {
+        foreignKey: 'post',
+        onDelete: 'CASCADE'
+      });
       Comment.belongsTo(models.Comment, {
         foreignKey: 'parent',
         onDelete: 'CASCADE'
@@ -22,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Comment.init({
+    post: DataTypes.INTEGER,
     user: DataTypes.INTEGER,
     parent: DataTypes.INTEGER,
     content: DataTypes.STRING(1024)

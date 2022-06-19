@@ -14,8 +14,6 @@ exports.handler = async function(event, context) {
   params.username = process.env.DB_USER;
   params.dbPort = process.env.DB_PORT;
   params.dbHost = process.env.DB_HOST;
-  
-  console.log({params})
 
   const umzug = await loadUmzug(params);
   return new Promise(async resolve => {

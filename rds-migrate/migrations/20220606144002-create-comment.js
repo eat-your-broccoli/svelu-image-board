@@ -13,8 +13,18 @@ module.exports = {
         references: {
           model: 'Users',
           key: 'id',
-          as: 'userId'
-        }
+          as: 'user'
+        },
+        onDelete: 'CASCADE' 
+      },
+      post: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Posts',
+          key: 'id',
+          as: 'post'
+        },
+        onDelete: 'CASCADE' 
       },
       parent: {
         type: Sequelize.INTEGER,
@@ -23,7 +33,8 @@ module.exports = {
           model: 'Comments',
           key: 'id',
           as: 'parent'
-        }
+        },
+        onDelete: 'CASCADE' 
       },
       content: {
         type: Sequelize.STRING(1024),

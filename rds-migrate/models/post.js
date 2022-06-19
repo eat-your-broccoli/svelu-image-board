@@ -14,11 +14,15 @@ module.exports = (sequelize, DataTypes) => {
       Post.belongsTo(models.User, {
         foreignKey: 'user',
         onDelete: 'CASCADE'
-      })
+      });
+      Post.hasMany(models.Comment, {foreignKey: 'post'});
     }
   }
   Post.init({
-    user: DataTypes.INTEGER
+    user: DataTypes.INTEGER,
+    thumbnail: DataTypes.STRING,
+    url: DataTypes.STRING,
+    title: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Post',

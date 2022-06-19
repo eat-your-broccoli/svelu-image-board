@@ -4,15 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --jobs 1",
+    "test-one": "mocha -f 'createComment' --jobs 1",
+    "setup": "node ./setup.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.1149.0",
     "aws-xray-sdk-core": "^3.3.6",
+    "dotenv": "^16.0.1",
     "mysql2": "^2.3.3",
     "sequelize": "^6.19.2",
     "umzug": "^3.1.1"
+  },
+  "devDependencies": {
+    "mocha": "^10.0.0"
   }
 }
