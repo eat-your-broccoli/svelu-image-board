@@ -6,6 +6,7 @@ const {Sequelize, Op} = require('sequelize');
 const { loadSequelize } = require('./loadUmzug');
 const AWS = AWSXRay.captureAWS(AWSSDK);
 const StatusCodes = require('./StatusCodes');
+const { handler } = require('.');
 
 // Create client outside of handler to reuse
 const lambda = new AWS.Lambda()
@@ -48,17 +49,16 @@ exports.handler = async function(event, context) {
     };
 
     const posts = await Post.findAll(dbParam);
-
     const response = {
       statusCode: StatusCodes.OKAY,
       posts: posts,
     }
-    return response;
-  } catch(err) {
-    console.error({err});
-    return {
-      statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
-      message: err.message
+    return (response);
+    } catch(err) {
+      console.error({err});
+      return {
+        statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
+        message: err.message
+      };
     }
-  }
 }
