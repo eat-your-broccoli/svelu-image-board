@@ -1,7 +1,14 @@
+output "invoke_arn" {
+  description = "invoke Arn of lambda function"
+  value = tomap({
+      for inst in aws_lambda_function.lambda_function : inst.function_name => inst.invoke_arn
+  })
+}
+
 output "arn" {
   description = "Arn of lambda function"
   value = tomap({
-      for inst in aws_lambda_function.lambda_function : inst.function_name => inst.invoke_arn
+      for inst in aws_lambda_function.lambda_function : inst.function_name => inst.arn
   })
 }
 

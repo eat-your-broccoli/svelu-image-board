@@ -5,7 +5,13 @@ resource "aws_cognito_user_pool" "user_pool" {
   password_policy {
     minimum_length = 10
   }
-  email_verification_subject = "Complete your registration at svelu"
+  verification_message_template {
+    default_email_option = "CONFIRM_WITH_LINK"
+    email_subject =  "Complete your registration at svelu"
+  }
+  lambda_config {
+    post_confirmation = var.post_confirmation_lambda_arn
+  }
 }
 
 
@@ -55,4 +61,12 @@ resource "local_file" "cognito_config" {
   ]
   content  = "{\n\"UserPoolId\": \"${aws_cognito_user_pool.user_pool.id}\", \n\"ClientId\": \"${aws_cognito_user_pool_client.client.id}\"\n}"
   filename = "./cloud-computing-app/src/config/cognito.config.json"
+}
+
+resource "aws_lambda_permission" "allow_execution_from_user_pool" {
+  statement_id = "AllowExecutionFromUserPool"
+  action = "lambda:InvokeFunction"
+  function_name = var.post_confirmation_lambda_function_name
+  principal = "cognito-idp.amazonaws.com"
+  source_arn = aws_cognito_user_pool.user_pool.arn
 }

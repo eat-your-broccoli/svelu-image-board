@@ -126,6 +126,11 @@ module lambda_api {
       timeout = 7
       handler = "createUser.handler"
     }
+    CognitoPostConfirmationLambda = {
+      function_name = "CognitoPostConfirmationLambda"
+      timeout = 7
+      handler = "cognitoConfirmCreateUser.handler"
+    }
   }
 
   env_db_name = "${module.rds.rds_name}"
@@ -144,37 +149,40 @@ module lambda_api {
 
 module "api_gateway" {
   depends_on = [
-    module.lambda_api
+    module.lambda_api,
+    module.cognito
   ]
 
   source = "./terraform-modules/aws-api-gateway"
   api_gateways = {
     GetPosts = {
       route_key = "GET /posts"
-      integration_uri = lookup(module.lambda_api.arn, "GetPosts")
+      integration_uri = lookup(module.lambda_api.invoke_arn, "GetPosts")
       function_name = lookup(module.lambda_api.function_name, "GetPosts")
     }
     CreatePost = {
       route_key = "POST /post"
-      integration_uri = lookup(module.lambda_api.arn, "CreatePost")
+      integration_uri = lookup(module.lambda_api.invoke_arn, "CreatePost")
       function_name = lookup(module.lambda_api.function_name, "CreatePost")
     }
     CreateUser = {
       route_key = "POST /user"
-      integration_uri = lookup(module.lambda_api.arn, "CreateUser")
+      integration_uri = lookup(module.lambda_api.invoke_arn, "CreateUser")
       function_name = lookup(module.lambda_api.function_name, "CreateUser")
     }
     GetCommentsForPost = {
       route_key = "GET /post/:post/comments"
-      integration_uri = lookup(module.lambda_api.arn, "GetCommentsForPost")
+      integration_uri = lookup(module.lambda_api.invoke_arn, "GetCommentsForPost")
       function_name = lookup(module.lambda_api.function_name, "GetCommentsForPost")
     }
     CreateComment = {
       route_key = "POST /post/:post/comment"
-      integration_uri = lookup(module.lambda_api.arn, "CreateComment")
+      integration_uri = lookup(module.lambda_api.invoke_arn, "CreateComment")
       function_name = lookup(module.lambda_api.function_name, "CreateComment")
     }
   }
+  cognito_user_pool_client_id = module.cognito.cognito_UserPoolId
+  cognito_user_pool_endpoint = module.cognito.cognito_domain
 }
 
 
@@ -187,5 +195,10 @@ module "lambda_rds_migration_invocation" {
 }
 
 module "cognito" {
+  depends_on = [
+    module.lambda_api
+  ]
   source = "./terraform-modules/aws-cognito"
+  post_confirmation_lambda_arn = lookup(module.lambda_api.arn, "CognitoPostConfirmationLambda")
+  post_confirmation_lambda_function_name = "CognitoPostConfirmationLambda"
 }

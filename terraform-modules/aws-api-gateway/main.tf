@@ -19,6 +19,8 @@ resource "aws_apigatewayv2_route" "route" {
     route_key = each.value.route_key
 
     target = "integrations/${aws_apigatewayv2_integration.lambda_integration[each.key].id}"
+    authorization_type = "JWT"
+    authorizer_id = aws_apigatewayv2_authorizer.auth.id
 }
 
 resource "aws_apigatewayv2_stage" "default" {
@@ -39,4 +41,17 @@ resource "aws_lambda_permission" "apigw_perm" {
     # The /*/* portion grants access from any method on any resource
     # within the API Gateway "REST API".
     source_arn = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
+}
+
+# secure aws api gateway with cognito
+resource "aws_apigatewayv2_authorizer" "auth" {
+  api_id           = aws_apigatewayv2_api.api.id
+  authorizer_type  = "JWT"
+  identity_sources = ["$request.header.Authorization"]
+  name             = "cognito-authorizer"
+
+  jwt_configuration {
+    audience = [var.cognito_user_pool_client_id]
+    issuer   = "${var.cognito_user_pool_endpoint}"
+  }
 }

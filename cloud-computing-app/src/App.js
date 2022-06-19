@@ -1,42 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { CognitoUserPool  } from 'amazon-cognito-identity-js'
+import React from 'react';
+import { Account } from './components/Accounts';
+import Signup from './components/Singup';
+import Status from './components/Status';
+import Login from './components/Login';
 
 export default () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const poolData = {
-    UserPoolId: 'eu-central-1_zPMNh6AcH',
-    ClientId: '5n8ig2i2kpr4ei3qo78svl1h4g'
-  };
-
-  const UserPool = new CognitoUserPool(poolData);
-
-  const onSubmit = event => {
-    event.preventDefault();
-
-    UserPool.signUp(email, password, [], null, (err, data) => {
-      if (err) console.error(err);
-      console.log(data);
-    });
-  };
-
   return (
-    <div>
-      <form onSubmit={onSubmit}>
-        <input
-          value={email}
-          onChange={event => setEmail(event.target.value)}
-        />
-
-        <input
-          value={password}
-          onChange={event => setPassword(event.target.value)}
-        />
-
-        <button type='submit'>Signup</button>
-      </form>
-    </div>
+    <Account>
+      <Status />
+      <Signup />
+      <Login />
+    </Account>
   );
 };
 

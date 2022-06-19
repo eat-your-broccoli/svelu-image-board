@@ -6,7 +6,6 @@ const {Sequelize, Op} = require('sequelize');
 const { loadSequelize } = require('./loadUmzug');
 const AWS = AWSXRay.captureAWS(AWSSDK);
 const StatusCodes = require('./StatusCodes');
-const { handler } = require('.');
 const { stringifyBody } = require('./helpers/stringifyBody');
 const { error2response } = require('./helpers/error2response');
 

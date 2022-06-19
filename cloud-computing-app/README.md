@@ -68,3 +68,17 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+### Cognito 
+
+A file cognito.config.json is needed. This file will be most likely generated through Terraform.
+
+It's content should look like this.
+```
+{
+    "UserPoolId": "",
+    "ClientId": ""
+}
+
+```

@@ -4,8 +4,8 @@ const {Sequelize} = require('sequelize');
 const { loadSequelize } = require('./loadUmzug');
 const AWS = AWSXRay.captureAWS(AWSSDK);
 const StatusCodes = require('./StatusCodes');
-const { stringifyBody } = require('./helpers/stringifyBody');
-const { error2response } = require('./helpers/error2response');
+const {stringifyBody} = require('./helpers/stringifyBody');
+const {error2response} = require('./helpers/error2response');
 // Create client outside of handler to reuse
 const lambda = new AWS.Lambda()
 

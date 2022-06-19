@@ -6,3 +6,5 @@ variable "api_gateways" {
         function_name = string
     }))
 }
+variable "cognito_user_pool_client_id" {}
+variable "cognito_user_pool_endpoint" {}

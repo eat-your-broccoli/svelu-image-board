@@ -6,6 +6,8 @@ const AWS = AWSXRay.captureAWS(AWSSDK);
 const StatusCodes = require('./StatusCodes');
 
 const {stringifyBody} = require('./helpers/stringifyBody');
+const {error2response} = require('./helpers/error2response')
+
 
 // Create client outside of handler to reuse
 const lambda = new AWS.Lambda()
@@ -21,6 +23,12 @@ exports.handler = async function(event, context) {
       error.statusCode = StatusCodes.BAD_REQ;
       throw error;
     }
+    if(event.email == null || event.email.length == 0) {
+      const error = new Error("email not defined or empty");
+      error.statusCode = StatusCodes.BAD_REQ;
+      throw error;
+    }
+
 
     if(sequelize == null) {
       sequelize = await loadSequelize();
@@ -30,7 +38,7 @@ exports.handler = async function(event, context) {
       User = require('./models/user')(sequelize, Sequelize);
     }
 
-    let user = User.build({username: event.username})
+    let user = User.build({username: event.username, email: event.email})
     await user.save();
     
     const response = {
@@ -45,6 +53,7 @@ exports.handler = async function(event, context) {
     return stringifyBody(response);
   } catch(err) {
     console.error({err});
-    return stringifyBody(error2response(err));
+    const newErr = error2response(err);
+    return stringifyBody(newErr);
   }
 }

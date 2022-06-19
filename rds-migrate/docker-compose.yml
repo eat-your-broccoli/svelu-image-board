@@ -1,5 +1,4 @@
 version: "3.6"
-version: '3.6'
 networks:
   internal:
     external: false
@@ -19,6 +18,7 @@ services:
       - ${MYSQL_PORT}:3306
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWD}
+      - MYSQL_DATABASE=svelu
     networks:
       - db
   phpmyadmin:

@@ -13,7 +13,7 @@ const username = "test-user-comment";
 
 before(async () => {
     await deleteUserByName(username);
-    const response = await createUser({username});
+    const response = await createUser({username, email: "test"});
     user = extractBody(response).user;
 })
 
