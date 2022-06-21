@@ -19,11 +19,6 @@ provider "aws" {
   region  = "eu-central-1"
 }
 
-module "vpc" {
-  source = "./terraform-modules/aws-vpc-rds"
-}
-
-
 # ## S3 bucket for our website
 module "website_bucket_s3" {
   source = "./terraform-modules/aws-s3-website-bucket"
@@ -36,6 +31,11 @@ module "website_bucket_s3" {
   }
   html_source = "website/index.html"
 }
+
+module "vpc" {
+  source = "./terraform-modules/aws-vpc-rds"
+}
+
 
 # relational database service (storing posts, tags, comments)
 module "rds" {
@@ -50,6 +50,7 @@ module "rds" {
  vpc_security_group_default_id = module.vpc.vpc_security_group_default_id
   aws_db_subnet_group_default_id = module.vpc.aws_db_subnet_group_default_id
   aws_security_group_rds_id = module.vpc.aws_security_group_rds_id
+  public = false
 }
 
 # ### Lambda functions
@@ -128,8 +129,13 @@ module lambda_api {
     }
     CognitoPostConfirmationLambda = {
       function_name = "CognitoPostConfirmationLambda"
-      timeout = 7
+      timeout = 15
       handler = "cognitoConfirmCreateUser.handler"
+    }
+    CognitoPostAuthLambda = {
+      function_name = "CognitoPostAuthLambda"
+      timeout = 7
+      handler = "CognitoPostAuthLambda.handler"
     }
   }
 
@@ -201,4 +207,9 @@ module "cognito" {
   source = "./terraform-modules/aws-cognito"
   post_confirmation_lambda_arn = lookup(module.lambda_api.arn, "CognitoPostConfirmationLambda")
   post_confirmation_lambda_function_name = "CognitoPostConfirmationLambda"
+
+  post_auth_lambda_arn = lookup(module.lambda_api.arn, "CognitoPostAuthLambda")
+  post_auth_lambda_function_name = "CognitoPostAuthLambda"
+
+  
 }

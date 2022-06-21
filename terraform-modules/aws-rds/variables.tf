@@ -25,3 +25,6 @@ variable "vpc_security_group_default_id" {
 
 variable "aws_db_subnet_group_default_id" {}
 variable "aws_security_group_rds_id" {}
+variable "public" {
+  default = false
+}
