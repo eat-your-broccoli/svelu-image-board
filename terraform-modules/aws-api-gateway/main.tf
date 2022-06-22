@@ -1,7 +1,14 @@
 resource "aws_apigatewayv2_api" "api"{
     name = "svelu-api"
     description = "API gateway for svelu"
-    protocol_type = "HTTP" 
+    protocol_type = "HTTP"
+
+    cors_configuration {
+        allow_origins = ["*"]
+        allow_methods = ["POST", "GET", "OPTIONS", "*"]
+        allow_headers = ["content-type", "Authorization"]
+        max_age = 300
+    }
 }
 
 resource "aws_apigatewayv2_integration" "lambda_integration" {
@@ -52,6 +59,7 @@ resource "aws_apigatewayv2_authorizer" "auth" {
 
   jwt_configuration {
     audience = [var.cognito_user_pool_client_id]
+    #audience = []
     issuer   = "${var.cognito_user_pool_endpoint}"
   }
 }
