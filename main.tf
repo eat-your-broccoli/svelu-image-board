@@ -171,11 +171,6 @@ module "api_gateway" {
       integration_uri = lookup(module.lambda_api.invoke_arn, "CreatePost")
       function_name = lookup(module.lambda_api.function_name, "CreatePost")
     }
-    CreateUser = {
-      route_key = "POST /user"
-      integration_uri = lookup(module.lambda_api.invoke_arn, "CreateUser")
-      function_name = lookup(module.lambda_api.function_name, "CreateUser")
-    }
     GetCommentsForPost = {
       route_key = "GET /post/:post/comments"
       integration_uri = lookup(module.lambda_api.invoke_arn, "GetCommentsForPost")
