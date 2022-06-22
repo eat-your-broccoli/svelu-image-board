@@ -132,11 +132,11 @@ module lambda_api {
       timeout = 15
       handler = "cognitoConfirmCreateUser.handler"
     }
-    CognitoPostAuthLambda = {
-      function_name = "CognitoPostAuthLambda"
-      timeout = 7
-      handler = "CognitoPostAuthLambda.handler"
-    }
+    # CognitoPostAuthLambda = {
+    #   function_name = "CognitoPostAuthLambda"
+    #   timeout = 7
+    #   handler = "cognitoPostAuth.handler"
+    # }
   }
 
   env_db_name = "${module.rds.rds_name}"
@@ -187,7 +187,7 @@ module "api_gateway" {
       function_name = lookup(module.lambda_api.function_name, "CreateComment")
     }
   }
-  cognito_user_pool_client_id = module.cognito.cognito_UserPoolId
+  cognito_user_pool_client_id = module.cognito.cognito_ClientID
   cognito_user_pool_endpoint = module.cognito.cognito_domain
 }
 
@@ -208,8 +208,6 @@ module "cognito" {
   post_confirmation_lambda_arn = lookup(module.lambda_api.arn, "CognitoPostConfirmationLambda")
   post_confirmation_lambda_function_name = "CognitoPostConfirmationLambda"
 
-  post_auth_lambda_arn = lookup(module.lambda_api.arn, "CognitoPostAuthLambda")
-  post_auth_lambda_function_name = "CognitoPostAuthLambda"
-
-  
+  # post_auth_lambda_arn = lookup(module.lambda_api.arn, "CognitoPostAuthLambda")
+  # post_auth_lambda_function_name = "CognitoPostAuthLambda"
 }
