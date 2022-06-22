@@ -1,6 +1,9 @@
 exports.handler = (event, context, callback) => {
 
     // Send post authentication data to Cloudwatch logs
+    console.log(JSON.stringify(event));
+    console.log(JSON.stringify(context));
+    
     console.log ("Authentication successful");
     console.log ("Trigger function =", event.triggerSource);
     console.log ("User pool = ", event.userPoolId);
@@ -8,5 +11,5 @@ exports.handler = (event, context, callback) => {
     console.log ("User ID = ", event.userName);
 
     // Return to Amazon Cognito
-    callback(null, event.myuser = event.userName + " <3");
+    callback(null, event);
 };

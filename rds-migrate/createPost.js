@@ -5,6 +5,8 @@ const { loadSequelize } = require('./loadUmzug');
 const AWS = AWSXRay.captureAWS(AWSSDK);
 const StatusCodes = require('./StatusCodes');
 const {stringifyBody} = require('./helpers/stringifyBody');
+const {extractBody} = require('./helpers/extractBody');
+
 const {error2response} = require('./helpers/error2response');
 // Create client outside of handler to reuse
 const lambda = new AWS.Lambda()
@@ -12,15 +14,32 @@ const lambda = new AWS.Lambda()
 let sequelize = null;
 let Post = null;
 
-// Handler
-exports.handler = async function(event, context) {
+exports.lambdaHandler = async function(event, context) {
   try {
-    if(event.title == null || event.title.length == 0) {
+    const body = extractBody(event);
+    event.params = {...event.pathParameters, ...body, ...event.queryStringParameters};
+    return await handler(event, context);
+  } catch (err) {
+    console.error({err});
+    return stringifyBody(error2response(err));
+  }
+}
+
+// Handler
+async function handler(event, context) {
+  try {
+    const title = event.params.title;
+    const user = event.params.user;
+    const url = event.params.url;
+    const thumbnail = event.params.thumbnail;
+    
+
+    if(title == null || title.length == 0) {
       const error = new Error("title not defined or empty");
       error.statusCode = StatusCodes.BAD_REQ;
       throw error;
     }
-    if(event.user == null && event !== 0) {
+    if(user == null && user !== 0) {
       const error = new Error("user not defined");
       error.statusCode = StatusCodes.BAD_REQ;
       throw error;
@@ -33,8 +52,6 @@ exports.handler = async function(event, context) {
     if(Post == null) {
       Post = require('./models/post')(sequelize, Sequelize);
     }
-
-    const {user, url, title, thumbnail} = event;
 
     let post = Post.build({user, url, title, thumbnail});
     await post.save();
@@ -51,3 +68,5 @@ exports.handler = async function(event, context) {
     return stringifyBody(error2response(err));
   }
 }
+
+exports.handler = handler;

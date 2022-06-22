@@ -8,6 +8,7 @@ const AWS = AWSXRay.captureAWS(AWSSDK);
 const StatusCodes = require('./StatusCodes');
 const { stringifyBody } = require('./helpers/stringifyBody');
 const { error2response } = require('./helpers/error2response');
+const { extractBody } = require('./helpers/extractBody');
 
 // Create client outside of handler to reuse
 const lambda = new AWS.Lambda()
@@ -16,11 +17,22 @@ let sequelize = null;
 let Post = null;
 let User = null;
 
-// Handler
-exports.handler = async function(event, context) {
+exports.lambdaHandler = async function(event, context) {
   try {
-    let lastId = event.lastId;
-    let pageSize = event.pageSize || 10;
+    const body = extractBody(event);
+    event.params = {...event.pathParameters, ...body, ...event.queryStringParameters};
+    return await handler(event, context);
+  } catch (err) {
+    console.error({err});
+    return stringifyBody(error2response(err));
+  }
+}
+
+// Handler
+async function handler(event, context) {
+  try {
+    let lastId = event.params.lastId;
+    let pageSize = event.params.pageSize || 10;
     if(pageSize > 50) pageSize = 50;
     if(pageSize <= 0) pageSize = 1;
 
@@ -62,3 +74,5 @@ exports.handler = async function(event, context) {
       return stringifyBody(error2response(err));
     }
 }
+
+exports.handler = handler;

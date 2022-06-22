@@ -20,7 +20,7 @@ const username = "test-user6";
 beforeEach(async () => {
   await deleteUserByName(username);
     
-  let response = await createUser({username});
+  let response = await createUser({username, email: username});
   user = extractBody(response).user;
 })
 
@@ -29,15 +29,17 @@ describe('getPosts', function () {
     it('should return list of posts', async function () {
       let posts = [];
       for(let i = 0; i < 10; i++) {
-        const promise = createPost({
+        const promise = createPost({params: {
           user: user.id,
           title: "Test post No "+(i+1)
-        });
+        }});
         posts.push(promise);
       }
       posts = await Promise.all(posts);
       const event = {
+        params: {
         pageSize: 10
+      }
       }
       let response = await getPosts(event, {});
       response = extractBody(response);
@@ -48,10 +50,10 @@ describe('getPosts', function () {
     it('should return list of some posts', async function () {
       let posts = [];
       for(let i = 0; i < 10; i++) {
-        const promise = createPost({
+        const promise = createPost({params: {
           user: user.id,
           title: "Test post No "+(i+1)
-        });
+        }});
         posts.push(promise);
       }
       posts = await Promise.all(posts);
@@ -60,10 +62,10 @@ describe('getPosts', function () {
       const maxId = Math.max(...ids);
   
       let lastId = maxId - 4;
-      const event = {
+      const event = {params: {
         pageSize: 10,
         lastId // offset by 5
-      }
+      }}
       let response = await getPosts(event, {});
       response = extractBody(response);
       const idsFiltered = response.posts.map(p => p.id);

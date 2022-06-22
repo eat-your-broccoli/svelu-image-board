@@ -15,7 +15,7 @@ before(async () => {
 describe('createUser', function () {
   describe('creates a user', function () {
     it('should create entry in database', async function () {
-      const response = await createUser({username}, {});
+      const response = await createUser({username, email: username}, {});
       user = extractBody(response).user;
       assert.equal(response.statusCode, 201);
       assert.equal(user.username, username);

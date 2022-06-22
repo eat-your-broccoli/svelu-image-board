@@ -10,21 +10,23 @@ const { extractBody } = require('../helpers/extractBody');
 let user;
 const username = "test-user-post";
 
+
 before(async () => {
     await deleteUserByName(username);
-    const response = await createUser({username});
+    const response = await createUser({username, email: username});
     user = extractBody(response).user;
 })
 
 describe('createPost', function () {
   describe('creates a post', function () {
     it('should return the id of the comment that was created', async function () {
-        const response = extractBody(await createPost({
-            user: user.id,
-            thumbnail: null,
-            url: null,
-            title: "My title"
-        }));
+        const p = {params: {
+          user: user.id,
+          thumbnail: null,
+          url: null,
+          title: "My title"
+        }}
+        const response = extractBody(await createPost(p));
         assert.equal(response.post.title, "My title");
         assert.equal(response.post.id >= 0, true); 
     });

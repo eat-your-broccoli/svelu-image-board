@@ -6,29 +6,45 @@ const AWS = AWSXRay.captureAWS(AWSSDK);
 const StatusCodes = require('./StatusCodes');
 const { stringifyBody } = require('./helpers/stringifyBody');
 const { error2response } = require('./helpers/error2response');
+const { extractBody } = require('./helpers/extractBody');
 // Create client outside of handler to reuse
 const lambda = new AWS.Lambda()
 
 let sequelize = null;
 let Comment = null;
 
-// Handler
-exports.handler = async function(event, context) {
+exports.lambdaHandler = async function(event, context) {
   try {
-    console.log({event})
-    if(event.content == null || event.content.length == 0) {
+    const body = extractBody(event);
+    event.params = {...event.pathParameters, ...body, ...event.queryStringParameters};
+    return await handler(event, context);
+  } catch (err) {
+    console.error({err});
+    return stringifyBody(error2response(err));
+  }
+}
+
+// Handler
+async function handler(event, context) {
+  try {
+    const content = event.params.content;
+    const parent = event.params.parent || null;
+    const post = event.params.post;
+    const user = event.params.user;
+    
+    if(content == null || content.length == 0) {
       const error = new Error("content not defined or empty");
       error.statusCode = StatusCodes.BAD_REQ;
       throw error;
     }
 
-    if(event.post == null && event.post != 0) {
+    if(post == null && post != 0) {
       const error = new Error("post not set");
       error.statusCode = StatusCodes.BAD_REQ;
       throw error;
     }
 
-    if(event.user == null && event.user != 0) {
+    if(user == null && user != 0) {
       const error = new Error("user not set");
       error.statusCode = StatusCodes.BAD_REQ;
       throw error;
@@ -42,7 +58,7 @@ exports.handler = async function(event, context) {
       Comment = require('./models/comment')(sequelize, Sequelize);
     }
 
-    let comment = Comment.build({parent: event.parent, user: event.user, content: event.content, post: event.post})
+    let comment = Comment.build({parent: parent, user: user, content: content, post: post})
     await comment.save();
 
     const response = {
@@ -57,3 +73,5 @@ exports.handler = async function(event, context) {
     return stringifyBody(error2response(err));
   }
 }
+
+exports.handler = handler;

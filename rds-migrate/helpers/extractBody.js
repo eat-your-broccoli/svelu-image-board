@@ -1,3 +1,6 @@
 exports.extractBody = function(response) {
-    return JSON.parse(response.body);
+    if(response.body && typeof response.body === 'string') {
+        return JSON.parse(response.body);
+    }
+    return {};
 }

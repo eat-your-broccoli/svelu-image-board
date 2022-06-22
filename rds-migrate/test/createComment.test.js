@@ -20,14 +20,15 @@ before(async () => {
 describe('createComment', function () {
   describe('creates a comment', function () {
     it('should return the id of the comment that was created', async function () {
-      let post = await createPost({
+      let post = await createPost({params: {
           user: user.id,
           thumbnail: null,
           url: null,
           title: "My title"
-      });
+      }});
         post = extractBody(post).post;
-        const event = {post: post.id, content: "Hi there", user: user.id};
+        const event = {};
+        event.params = {post: post.id, content: "Hi there", user: user.id};
         const response = extractBody(await createComment.handler(event, {}));
         assert.equal((response.comment.id != null || response.comment.id === 0), true);
     });

@@ -20,11 +20,9 @@ before(async () => {
   await deleteUserByName(username);
   await deleteUserByName(usernameOther);
     
-  let response = await createUser({username});
+  let response = await createUser({username, email: username});
   user = extractBody(response).user;
-  response = await createUser({username: usernameOther});
-  otherUser = response.user;
-  response = await createUser({username: usernameOther});
+  response = await createUser({username: usernameOther, email: usernameOther});
   otherUser = extractBody(response).user;
 })
 
@@ -32,16 +30,17 @@ describe('getCommentsForPost', function () {
   describe('gets comments for post', function () {
     it('should return list of comments', async function () {
       let post = await createPost({
+        params: {
         user: user.id,
         title: "My title"
-      });
+      }});
       post = extractBody(post).post;
 
-      const c1 = await createComment({post: post.id, content: "Hi there 1", user: user.id}, {});
-      const c2 = await createComment({post: post.id, content: "Hi there 2 from other user", user: otherUser.id}, {});
-      let c3 = await createComment({post: post.id, content: "Hi there 3 from other user", user: otherUser.id}, {});
+      const c1 = await createComment({params: {post: post.id, content: "Hi there 1", user: user.id}}, {});
+      const c2 = await createComment({params: {post: post.id, content: "Hi there 2 from other user", user: otherUser.id}}, {});
+      let c3 = await createComment({params: {post: post.id, content: "Hi there 3 from other user", user: otherUser.id}}, {});
       c3 = extractBody(c3).comment;
-      let response = await getCommentsForPost({post:post.id});
+      let response = await getCommentsForPost({params: {post:post.id}});
       response = extractBody(response);
       assert.equal(response.post, post.id);
       assert.equal(response.comments.length, 3);
