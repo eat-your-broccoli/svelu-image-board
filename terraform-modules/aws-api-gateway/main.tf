@@ -63,3 +63,12 @@ resource "aws_apigatewayv2_authorizer" "auth" {
     issuer   = "${var.cognito_user_pool_endpoint}"
   }
 }
+
+# 
+resource "local_file" "api_config_frontend" {
+  depends_on = [
+    aws_apigatewayv2_stage.default
+  ]
+  content  = "{\n\"api_url\": \"${aws_apigatewayv2_stage.default.invoke_url}\"\n}"
+  filename = "./cloud-computing-app/src/config/api.config.json"
+}
