@@ -11,7 +11,7 @@ resource "aws_cognito_user_pool" "user_pool" {
   }
   lambda_config {
     post_confirmation = var.post_confirmation_lambda_arn
-    # post_authentication = var.post_auth_lambda_arn
+    pre_token_generation = var.pre_token_generation_lambda_arn
   }
 }
 
@@ -72,10 +72,10 @@ resource "aws_lambda_permission" "allow_execution_from_user_pool" {
   source_arn = aws_cognito_user_pool.user_pool.arn
 }
 
-# resource "aws_lambda_permission" "allow_execution_from_user_pool_post_auth" {
-#   statement_id = "AllowExecutionFromUserPool"
-#   action = "lambda:InvokeFunction"
-#   function_name = var.post_auth_lambda_function_name
-#   principal = "cognito-idp.amazonaws.com"
-#   source_arn = aws_cognito_user_pool.user_pool.arn
-# }
+resource "aws_lambda_permission" "allow_execution_from_user_pool_pre_token_gen" {
+  statement_id = "AllowExecutionFromUserPool"
+  action = "lambda:InvokeFunction"
+  function_name = var.pre_token_generation_lambda_func_name
+  principal = "cognito-idp.amazonaws.com"
+  source_arn = aws_cognito_user_pool.user_pool.arn
+}

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --jobs 1",
-    "test-one": "mocha -f 'getCommentsForPost' --jobs 1",
+    "test-one": "mocha -f 'cognitoPreTokenGen' --jobs 1",
     "setup": "node ./setup.js"
   },
   "author": "",

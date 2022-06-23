@@ -105,22 +105,22 @@ module lambda_api {
     GetPosts = {
       function_name = "GetPosts"
       timeout = 7
-      handler =  "getPosts.handler"
+      handler =  "getPosts.lambdaHandler"
     }
     CreatePost = {
       function_name = "CreatePost"
       timeout = 7
-      handler = "createPost.handler"
+      handler = "createPost.lambdaHandler"
     }
     GetCommentsForPost = {
       function_name = "GetCommentsForPost"
       timeout = 7
-      handler =  "getCommentsForPost.handler"
+      handler =  "getCommentsForPost.lambdaHandler"
     }
     CreateComment = {
       function_name = "CreateComment"
       timeout = 7
-      handler = "createComment.handler"
+      handler = "createComment.lambdaHandler"
     }
     CreateUser = {
       function_name = "CreateUser"
@@ -132,11 +132,11 @@ module lambda_api {
       timeout = 15
       handler = "cognitoConfirmCreateUser.handler"
     }
-    # CognitoPostAuthLambda = {
-    #   function_name = "CognitoPostAuthLambda"
-    #   timeout = 7
-    #   handler = "cognitoPostAuth.handler"
-    # }
+    CognitoPreTokenGen = {
+      function_name = "CognitoPreTokenGen"
+      timeout = 15
+      handler = "cognitoPreTokenGen.handler"
+    }
   }
 
   env_db_name = "${module.rds.rds_name}"
@@ -172,12 +172,12 @@ module "api_gateway" {
       function_name = lookup(module.lambda_api.function_name, "CreatePost")
     }
     GetCommentsForPost = {
-      route_key = "GET /post/:post/comments"
+      route_key = "GET /post/{post}/comments"
       integration_uri = lookup(module.lambda_api.invoke_arn, "GetCommentsForPost")
       function_name = lookup(module.lambda_api.function_name, "GetCommentsForPost")
     }
     CreateComment = {
-      route_key = "POST /post/:post/comment"
+      route_key = "POST /post/{post}/comment"
       integration_uri = lookup(module.lambda_api.invoke_arn, "CreateComment")
       function_name = lookup(module.lambda_api.function_name, "CreateComment")
     }
@@ -203,6 +203,6 @@ module "cognito" {
   post_confirmation_lambda_arn = lookup(module.lambda_api.arn, "CognitoPostConfirmationLambda")
   post_confirmation_lambda_function_name = "CognitoPostConfirmationLambda"
 
-  # post_auth_lambda_arn = lookup(module.lambda_api.arn, "CognitoPostAuthLambda")
-  # post_auth_lambda_function_name = "CognitoPostAuthLambda"
+  pre_token_generation_lambda_arn = lookup(module.lambda_api.arn, "CognitoPreTokenGen")
+  pre_token_generation_lambda_func_name = "CognitoPreTokenGen"
 }
