@@ -7,6 +7,7 @@ const StatusCodes = require('./StatusCodes');
 const { stringifyBody } = require('./helpers/stringifyBody');
 const { error2response } = require('./helpers/error2response');
 const { extractBody } = require('./helpers/extractBody');
+const { extractUserIdFromJWT } = require('./helpers/extractUserIdFromJWT');
 // Create client outside of handler to reuse
 const lambda = new AWS.Lambda()
 
@@ -17,6 +18,7 @@ exports.lambdaHandler = async function(event, context) {
   try {
     const body = extractBody(event);
     event.params = {...event.pathParameters, ...body, ...event.queryStringParameters};
+    event.params.user = extractUserIdFromJWT(event.requestContext.authorizer.jwt);
     return await handler(event, context);
   } catch (err) {
     console.error({err});

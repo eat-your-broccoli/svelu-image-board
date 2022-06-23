@@ -9,9 +9,7 @@ const StatusCodes = require('./StatusCodes');
 const { stringifyBody } = require('./helpers/stringifyBody');
 const { error2response } = require('./helpers/error2response');
 const { extractBody } = require('./helpers/extractBody');
-
-// Create client outside of handler to reuse
-const lambda = new AWS.Lambda()
+const { extractUserIdFromJWT } = require('./helpers/extractUserIdFromJWT');
 
 let sequelize = null;
 let Post = null;
@@ -19,8 +17,11 @@ let User = null;
 
 exports.lambdaHandler = async function(event, context) {
   try {
+    console.log(event);
+    console.log(JSON.stringify(event));
     const body = extractBody(event);
     event.params = {...event.pathParameters, ...body, ...event.queryStringParameters};
+    event.user = extractUserIdFromJWT(event.requestContext.authorizer.jwt);
     return await handler(event, context);
   } catch (err) {
     console.error({err});

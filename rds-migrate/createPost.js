@@ -8,6 +8,7 @@ const {stringifyBody} = require('./helpers/stringifyBody');
 const {extractBody} = require('./helpers/extractBody');
 
 const {error2response} = require('./helpers/error2response');
+const { extractUserIdFromJWT } = require('./helpers/extractUserIdFromJWT');
 // Create client outside of handler to reuse
 const lambda = new AWS.Lambda()
 
@@ -17,7 +18,10 @@ let Post = null;
 exports.lambdaHandler = async function(event, context) {
   try {
     const body = extractBody(event);
+    console.log(event);
     event.params = {...event.pathParameters, ...body, ...event.queryStringParameters};
+    event.params.user = extractUserIdFromJWT(event.requestContext.authorizer.jwt);
+    console.log(event.params);
     return await handler(event, context);
   } catch (err) {
     console.error({err});
@@ -33,7 +37,6 @@ async function handler(event, context) {
     const url = event.params.url;
     const thumbnail = event.params.thumbnail;
     
-
     if(title == null || title.length == 0) {
       const error = new Error("title not defined or empty");
       error.statusCode = StatusCodes.BAD_REQ;

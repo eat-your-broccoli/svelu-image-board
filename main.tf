@@ -61,35 +61,7 @@ resource "aws_s3_bucket" "lambda_bucket" {
   force_destroy = true
 }
 
-#### lambda function for rds migrations
-module "lambda_rds_migration" {
-  depends_on = [
-    module.rds,
-    module.vpc
-  ]
-
-  source      = "./terraform-modules/aws-lambda-rds-migration"
-  bucket_id = aws_s3_bucket.lambda_bucket.id
-  src_path    = "./rds-migrate"
-  out_path    = "./terraform-modules/aws-lambda-rds-migration/rds/lambda-rds-migrate.zip"
-  file_key    = "lambda-rds-migrate.zip"
-  function_name = "LambdaRdsMigration"
-
-  env_db_name = "${module.rds.rds_name}"
-  env_db_pass = "${module.rds.rds_password}"
-  env_db_user = "${module.rds.rds_user}"
-
-  env_db_address = "${module.rds.rds_address}"
-  env_db_port =  "${module.rds.rds_port}"
-
-  rds_vpc_id = module.vpc.vpc_id
-  aws_db_subnet_group_default_id = module.vpc.aws_db_subnet_group_default_id
-  aws_subnet_rds_ids = module.vpc.aws_subnet_rds_ids
-  aws_security_group_rds_id = module.vpc.aws_security_group_rds_id
-  vpc_security_group_default_id = module.vpc.vpc_security_group_default_id
-}
-
-module lambda_api {
+module lambdas {
   depends_on = [
     module.rds,
     module.vpc
@@ -137,6 +109,11 @@ module lambda_api {
       timeout = 15
       handler = "cognitoPreTokenGen.handler"
     }
+    RdsMigration = {
+      function_name = "RdsMigration"
+      timeout = 20
+      handler = "index.handler"
+    }
   }
 
   env_db_name = "${module.rds.rds_name}"
@@ -155,7 +132,7 @@ module lambda_api {
 
 module "api_gateway" {
   depends_on = [
-    module.lambda_api,
+    module.lambdas,
     module.cognito
   ]
 
@@ -163,23 +140,23 @@ module "api_gateway" {
   api_gateways = {
     GetPosts = {
       route_key = "GET /posts"
-      integration_uri = lookup(module.lambda_api.invoke_arn, "GetPosts")
-      function_name = lookup(module.lambda_api.function_name, "GetPosts")
+      integration_uri = lookup(module.lambdas.invoke_arn, "GetPosts")
+      function_name = lookup(module.lambdas.function_name, "GetPosts")
     }
     CreatePost = {
       route_key = "POST /post"
-      integration_uri = lookup(module.lambda_api.invoke_arn, "CreatePost")
-      function_name = lookup(module.lambda_api.function_name, "CreatePost")
+      integration_uri = lookup(module.lambdas.invoke_arn, "CreatePost")
+      function_name = lookup(module.lambdas.function_name, "CreatePost")
     }
     GetCommentsForPost = {
       route_key = "GET /post/{post}/comments"
-      integration_uri = lookup(module.lambda_api.invoke_arn, "GetCommentsForPost")
-      function_name = lookup(module.lambda_api.function_name, "GetCommentsForPost")
+      integration_uri = lookup(module.lambdas.invoke_arn, "GetCommentsForPost")
+      function_name = lookup(module.lambdas.function_name, "GetCommentsForPost")
     }
     CreateComment = {
       route_key = "POST /post/{post}/comment"
-      integration_uri = lookup(module.lambda_api.invoke_arn, "CreateComment")
-      function_name = lookup(module.lambda_api.function_name, "CreateComment")
+      integration_uri = lookup(module.lambdas.invoke_arn, "CreateComment")
+      function_name = lookup(module.lambdas.function_name, "CreateComment")
     }
   }
   cognito_user_pool_client_id = module.cognito.cognito_ClientID
@@ -189,20 +166,20 @@ module "api_gateway" {
 
 module "lambda_rds_migration_invocation" {
   depends_on = [
-    module.lambda_rds_migration
+    module.lambdas
   ]
   source = "./terraform-modules/aws-lambda-rds-migration-invocation"
-  lambda_func_name = module.lambda_rds_migration.lambda_func_name
+  lambda_func_name = lookup(module.lambdas.function_name, "RdsMigration")
 }
 
 module "cognito" {
   depends_on = [
-    module.lambda_api
+    module.lambdas
   ]
   source = "./terraform-modules/aws-cognito"
-  post_confirmation_lambda_arn = lookup(module.lambda_api.arn, "CognitoPostConfirmationLambda")
+  post_confirmation_lambda_arn = lookup(module.lambdas.arn, "CognitoPostConfirmationLambda")
   post_confirmation_lambda_function_name = "CognitoPostConfirmationLambda"
 
-  pre_token_generation_lambda_arn = lookup(module.lambda_api.arn, "CognitoPreTokenGen")
+  pre_token_generation_lambda_arn = lookup(module.lambdas.arn, "CognitoPreTokenGen")
   pre_token_generation_lambda_func_name = "CognitoPreTokenGen"
 }
