@@ -1,3 +1,4 @@
+/* eslint-disable import/no-anonymous-default-export */
 import React, { useState, useContext, useEffect } from 'react';
 import { AccountContext } from './Accounts';
 

@@ -1,10 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { AccountContext } from './Accounts';
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+ 
   const { authenticate } = useContext(AccountContext);
 
   const onSubmit = event => {
