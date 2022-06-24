@@ -30,7 +30,7 @@ export default () => {
   }
 
   return (
-    <div style={{display: 'flex'}}>
+    <div class="header-block" style={{display: 'flex'}}>
       {isLogin &&
       <>
         <button style={{marginRight: '5px', maxHeight: '20px'}} onClick={toggleModal}>Register</button>
@@ -53,15 +53,17 @@ export default () => {
       </>
       }
       {!isLogin &&
-      <div class="modal-backdrop">
-        <div class="modal-container">
-          <Modal.Dialog>
+      <div class="modal-backdrop" onClick={toggleModal}>
+        <div class="modal-container" onClick={(event) => {event.stopPropagation()}}>
+          <Modal.Dialog style={{textAlign: 'left'}}>
             <h2> Register at SVELU</h2>
           
             <Modal.Body>
                 <Singup></Singup>
-                <button onClick={toggleModal}> Close </button>
             </Modal.Body>
+            <Modal.Footer style={{display: 'flex', justifyContent: 'end'}}>
+              <button onClick={toggleModal}> Close </button>
+            </Modal.Footer>
           </Modal.Dialog>
         </div>
       </div>

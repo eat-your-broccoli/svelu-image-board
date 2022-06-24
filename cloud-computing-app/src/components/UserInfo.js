@@ -4,10 +4,10 @@ import '../css/Header.css'
 import { AccountContext } from './Accounts';
 export default () => {
     const {username} = useContext(AccountContext);
-    const { getSession, logout } = useContext(AccountContext);
+    const { logout } = useContext(AccountContext);
 
 
     return (
-        <div class="header-block left-flex">Logged in as {username} <button onClick={logout}>logout</button></div>
+        <div class="header-block left-flex">Logged in as {username}    <button onClick={logout}>logout</button></div>
     );
 }
