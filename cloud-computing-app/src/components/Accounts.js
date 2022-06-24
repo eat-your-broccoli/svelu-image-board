@@ -6,7 +6,8 @@ const AccountContext = createContext()
 
 const Account = (props) => {
   const [username, setUsername] = useState('');
-
+  const [isLoggedIn, SetIsLoggedIn] = useState(false);
+  
   const getSession = async () => {
     return await new Promise(async (resolve, reject) => {
       const user = Pool.getCurrentUser()
@@ -34,6 +35,7 @@ const Account = (props) => {
             })
 
             const token = session.getIdToken().getJwtToken()
+            SetIsLoggedIn(true);
             resolve({
               user,
               headers: {
@@ -52,23 +54,26 @@ const Account = (props) => {
 
   const authenticate = async (Username, Password) =>
     await new Promise((resolve, reject) => {
-      updateUsername();
       const user = new CognitoUser({ Username, Pool })
       const authDetails = new AuthenticationDetails({ Username, Password })
 
       user.authenticateUser(authDetails, {
         onSuccess: (data) => {
           console.log('onSuccess:', data)
+          updateUsername();
+          SetIsLoggedIn(true);
           resolve(data)
         },
 
         onFailure: (err) => {
-          console.error('onFailure:', err)
+          console.error('onFailure:', err);
+          SetIsLoggedIn(false);
           reject(err)
         },
 
         newPasswordRequired: (data) => {
           console.log('newPasswordRequired:', data)
+          SetIsLoggedIn(false);
           resolve(data)
         },
       })
@@ -82,6 +87,7 @@ const Account = (props) => {
 
   const logout = () => {
     setUsername('');
+    SetIsLoggedIn(false);
     const user = Pool.getCurrentUser()
     if (user) {
       user.signOut()
@@ -94,6 +100,7 @@ const Account = (props) => {
     <AccountContext.Provider
       value={{
         username,
+        isLoggedIn,
         authenticate,
         getSession,
         logout,

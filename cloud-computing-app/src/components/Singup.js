@@ -6,11 +6,13 @@ export default () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [emailRepeat, setEmailRepeat] = useState('');
+  const [errorText, setErrorText] = useState('');
   
   const [password, setPassword] = useState('');
 
   const onSubmit = event => {
     event.preventDefault();
+    setErrorText('');
     if(email !== emailRepeat) throw new Error("emails don't match");
     if(username == null || username.length < 3) throw new Error("username has to be at least three characters long");
 
@@ -21,7 +23,10 @@ export default () => {
     });
 
     UserPool.signUp(username, password, attributes, null, (err, data) => {
-      if (err) console.error(err);
+      if (err) {
+        console.error(err);
+        setErrorText(err.message);
+      }
       console.log(data);
     });
   };
@@ -54,6 +59,7 @@ export default () => {
 
         <button type='submit'>Signup</button>
       </form>
+      <p style={{color: 'red'}}>{errorText}</p>
     </div>
   );
 };

@@ -22,3 +22,25 @@
 .left-flex {
     align-self: flex-end;
 }
+
+.modal-backdrop {
+    width:100vw;
+    height:100vh;
+    position:absolute;
+    top:0;
+    left:0;
+    position: absolute;
+    z-index: 10;
+    background: rgba(130, 97, 97, 0.501);
+    padding: 50px;
+}
+.modal-container {
+    max-width: 600px;
+    min-width: 200px;
+    width: 40vw;
+    margin: 40px auto;
+    border-radius: 10px;
+    background: #161618;
+    color: white;
+    padding: 20px;
+}
