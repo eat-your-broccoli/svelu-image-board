@@ -87,4 +87,8 @@ variable "env_bucket_thumbnails" {
   description = "bucket name for the media bucket"
 }
 
+variable "env_bucket_media_url" {}
+variable "env_bucket_thumbnails_url" {}
+
+
 

@@ -55,6 +55,8 @@ resource "aws_lambda_function" "lambda_function" {
       DB_HOST = var.env_db_address
       BUCKET_NAME_MEDIA = var.env_bucket_media
       BUCKET_NAME_THUMBNAILS = var.env_bucket_thumbnails
+      BUCKET_MEDIA_URL = var.env_bucket_media_url
+      BUCKET_THUMBNAILS_URL = var.env_bucket_thumbnails_url
     }
   }
 

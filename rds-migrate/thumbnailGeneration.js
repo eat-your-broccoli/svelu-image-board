@@ -42,6 +42,7 @@ async function handler(event, context) {
             Key: srcKey
         };
         var origimage = await s3.getObject(params).promise();
+        console.log({origimage})
         const meta = origimage.Metadata;
         // Use the sharp module to resize the image and save in a buffer.
         var buffer = await sharp(origimage.Body).resize(thumbnailSize, thumbnailSize, {fit: 'cover'}).toBuffer();
@@ -55,6 +56,7 @@ async function handler(event, context) {
             Metadata: {
                 "user": ""+meta.user, // need to be converted to string
                 "post": ""+meta.post,
+                "originalkey": srcKey,
               }
         };
 

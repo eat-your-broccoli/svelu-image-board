@@ -147,6 +147,11 @@ module lambdas {
       timeout = 20
       handler = "thumbnailGeneration.handler"
     }
+    PostEntryUpdater = {
+      function_name = "PostEntryUpdater"
+      timeout = 20
+      handler = "postEntryUpdater.lambdaHandler"
+    }
   }
 
   env_db_name = "${module.rds.rds_name}"
@@ -154,7 +159,9 @@ module lambdas {
   env_db_user = "${module.rds.rds_user}"
   env_bucket_media = "${var.bucket_name_media}"
   env_bucket_thumbnails = "${var.bucket_name_thumbnails}"
-
+  env_bucket_media_url = "${module.media_buckets.media_bucket_url}"
+  env_bucket_thumbnails_url = "${module.media_buckets.thumbnails_bucket_url}"
+  
   env_db_address = "${module.rds.rds_address}"
   env_db_port =  "${module.rds.rds_port}"
 
@@ -175,6 +182,11 @@ module "media_bucket_triggers" {
   lambda_thumbnail_arn = lookup(module.lambdas.arn, "CreateThumbnail")
   bucket_media_arn = module.media_buckets.media_bucket_arn
   bucket_media_id = var.bucket_name_media
+
+  lambda_post_func_name = lookup(module.lambdas.function_name, "PostEntryUpdater")
+  lambda_post_arn = lookup(module.lambdas.arn, "PostEntryUpdater")
+  bucket_thumbnails_arn = module.media_buckets.thumbnails_bucket_arn
+  bucket_thumbnails_id = var.bucket_name_thumbnails
 }
 
 module "api_gateway" {
