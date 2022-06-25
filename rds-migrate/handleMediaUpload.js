@@ -73,7 +73,12 @@ async function handler(event, context) {
       Key: postId +"."+fileEnding,
       Body: buffer,
       ContentEncoding: "base64", //we tell s3 to deal with that base64 encoded by themselves. we have spent enough time doing that ourselves
-      ContentType: contentType
+      ContentType: contentType,
+      // set metadata
+      Metadata: {
+        "user": ""+event.user, // need to be converted to string
+        "post": ""+postId,
+      }
     }
 
     let uploadResult = new AWS.S3.ManagedUpload({
