@@ -22,7 +22,7 @@ provider "aws" {
 # ## S3 bucket for our website
 module "website_bucket_s3" {
   source = "./terraform-modules/aws-s3-website-bucket"
-  bucket_name = "website-bucket-s3-sven"
+  bucket_name = var.bucket_name_website
   tags = {
     Name        = "Static Website Bucket"
     Environment = "Terraform"
@@ -32,12 +32,12 @@ module "website_bucket_s3" {
 
 module "media_buckets" {
   source = "./terraform-modules/aws-s3-media"
-  bucket_name_media = "svelu-bucket-media"
+  bucket_name_media = var.bucket_name_media
   tags_media = {
     Name        = "Media Bucket"
     Environment = "Terraform"
   }
-  bucket_name_thumbnails = "svelu-bucket-thumbnails"
+  bucket_name_thumbnails = var.bucket_name_thumbnails
   tags_thumbnails = {
     Name        = "Thumbnail Bucket"
     Environment = "Terraform"
@@ -45,7 +45,11 @@ module "media_buckets" {
 }
 
 module "vpc" {
+  depends_on = [
+    module.media_buckets
+  ]
   source = "./terraform-modules/aws-vpc-rds"
+  bucket_arns = module.media_buckets.bucket_arns
 }
 
 
@@ -57,7 +61,7 @@ module "rds" {
  source = "./terraform-modules/aws-rds"
  rds_name = "myRDS"
  rds_user = "root"
- rds_password = "myTotallySecure36423674534723P4w0rdddd"
+ rds_password = var.rds_root_password
  rds_vpc_id = module.vpc.vpc_id
  vpc_security_group_default_id = module.vpc.vpc_security_group_default_id
   aws_db_subnet_group_default_id = module.vpc.aws_db_subnet_group_default_id
@@ -68,7 +72,7 @@ module "rds" {
 # ### Lambda functions
 
 resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = "bucket-lambda-rds-migration-sven"
+  bucket = var.bucket_name_lambdas
   acl           = "private"
   force_destroy = true
 }
@@ -129,7 +133,7 @@ module lambdas {
     }
     MediaUploadHandler = {
       function_name = "MediaUploadHandler"
-      timeout = 60
+      timeout = 20
       handler = "handleMediaUpload.lambdaHandler"
     }
   }
@@ -137,7 +141,7 @@ module lambdas {
   env_db_name = "${module.rds.rds_name}"
   env_db_pass = "${module.rds.rds_password}"
   env_db_user = "${module.rds.rds_user}"
-  env_bucket_media = "${module.media_buckets.media_bucket_name}"
+  env_bucket_media = "${var.bucket_name_media}"
 
   env_db_address = "${module.rds.rds_address}"
   env_db_port =  "${module.rds.rds_port}"
@@ -206,4 +210,5 @@ module "cognito" {
 
   pre_token_generation_lambda_arn = lookup(module.lambdas.arn, "CognitoPreTokenGen")
   pre_token_generation_lambda_func_name = "CognitoPreTokenGen"
+  cognito_domain = var.cognito_domain
 }

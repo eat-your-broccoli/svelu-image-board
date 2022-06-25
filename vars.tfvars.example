@@ -1,0 +1,6 @@
+bucket_name_media = "svelu-media-bucket"
+bucket_name_thumbnails = "svelu-media-thumbnails"
+bucket_name_website = "svelu-website-bucket"
+bucket_name_lambdas = "svelu-lambdas-bucket"
+cognito_domain = "svelu-auth"
+rds_root_password=
