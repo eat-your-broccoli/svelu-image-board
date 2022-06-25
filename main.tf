@@ -46,10 +46,10 @@ module "media_buckets" {
 
 module "vpc" {
   depends_on = [
-    module.media_buckets
+    # module.media_buckets
   ]
   source = "./terraform-modules/aws-vpc-rds"
-  bucket_arns = module.media_buckets.bucket_arns
+  # bucket_arns = module.media_buckets.bucket_arns
 }
 
 
