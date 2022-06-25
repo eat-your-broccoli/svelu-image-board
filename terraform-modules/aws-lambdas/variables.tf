@@ -77,4 +77,7 @@ variable "aws_security_group_rds_id" {}
 variable "vpc_security_group_default_id" {}
 
 
-
+variable "env_bucket_media" {
+  type = string
+  description = "bucket name for the media bucket"
+}

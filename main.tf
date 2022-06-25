@@ -76,7 +76,8 @@ resource "aws_s3_bucket" "lambda_bucket" {
 module lambdas {
   depends_on = [
     module.rds,
-    module.vpc
+    module.vpc,
+    module.media_buckets
   ]
 
   source      = "./terraform-modules/aws-lambdas"
@@ -128,7 +129,7 @@ module lambdas {
     }
     MediaUploadHandler = {
       function_name = "MediaUploadHandler"
-      timeout = 20
+      timeout = 60
       handler = "handleMediaUpload.lambdaHandler"
     }
   }
@@ -136,6 +137,7 @@ module lambdas {
   env_db_name = "${module.rds.rds_name}"
   env_db_pass = "${module.rds.rds_password}"
   env_db_user = "${module.rds.rds_user}"
+  env_bucket_media = "${module.media_buckets.media_bucket_name}"
 
   env_db_address = "${module.rds.rds_address}"
   env_db_port =  "${module.rds.rds_port}"

@@ -51,6 +51,7 @@ resource "aws_lambda_function" "lambda_function" {
       DB_PASS = var.env_db_pass
       DB_PORT = var.env_db_port
       DB_HOST = var.env_db_address
+      BUCKET_NAME_MEDIA = var.env_bucket_media
     }
   }
 
@@ -75,6 +76,32 @@ resource "aws_iam_role" "lambda_exec" {
       }
     ]
   })
+}
+
+resource "aws_iam_policy" "lambda_s3_policy" {
+  name = "lambda_s3_policy"
+  path = "/"
+  description = "Allow lambda access to s3 buckets"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "s3:*",
+        ]
+        Effect   = "Allow"
+        Resource = "arn:aws:s3:::*"
+        Sid      = "Stmt1562499798378"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "s3_attatch" {
+  name = "s3_attatch"
+  roles = [aws_iam_role.lambda_exec.name]
+  policy_arn = aws_iam_policy.lambda_s3_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy_2" {
