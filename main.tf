@@ -126,6 +126,11 @@ module lambdas {
       timeout = 20
       handler = "index.handler"
     }
+    MediaUploadHandler = {
+      function_name = "MediaUploadHandler"
+      timeout = 20
+      handler = "handleMediaUpload.lambdaHandler"
+    }
   }
 
   env_db_name = "${module.rds.rds_name}"
@@ -169,6 +174,11 @@ module "api_gateway" {
       route_key = "POST /post/{post}/comment"
       integration_uri = lookup(module.lambdas.invoke_arn, "CreateComment")
       function_name = lookup(module.lambdas.function_name, "CreateComment")
+    }
+    UploadMedia = {
+      route_key = "PUT /post"
+      integration_uri = lookup(module.lambdas.invoke_arn, "MediaUploadHandler")
+      function_name = lookup(module.lambdas.function_name, "MediaUploadHandler")
     }
   }
   cognito_user_pool_client_id = module.cognito.cognito_ClientID
