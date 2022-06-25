@@ -6,3 +6,4 @@ variable "post_confirmation_lambda_function_name" {}
 
 variable "pre_token_generation_lambda_arn" {}
 variable "pre_token_generation_lambda_func_name" {}
+variable "cognito_domain" {}

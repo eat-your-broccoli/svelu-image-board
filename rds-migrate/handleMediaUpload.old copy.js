@@ -35,17 +35,28 @@ async function handler(event, context) {
   try {
 
     // TODO create db entry for post
+    const post = await createPost({params: {user: event.user, title: event.params.title}});
+    console.log({post});
+    const postBody = JSON.parse(post.body);
+    const postId = postBody.id;
+
+    const {file: fileBase64Encoded, contentType, fileName} = event.params;
+    const binaryData = Buffer.from(fileBase64Encoded, 'base64').toString('binary');
+
     const file = {
-      Bucket: process.env.BUCKET_NAME_MEDIA,
-      Key: "example" + ".json",
-      Body: JSON.stringify({foo: "bar"}),
-      ContentType: 'application/json'
+      Bucket: process.env.BUCKET_NAME_MEDIA, // TODO set env BUCKET_NAME
+      Key: postId + ".jpg",
+      Body: binaryData,
+      ContentType: contentType
     }
     // TODO put that "file" on the s3 storage
     // const uploadResult = await S3.putObject(file).promise();
     let uploadResult = new AWS.S3.ManagedUpload({
       partSize: 10 * 1024 * 1024, queueSize: 1,
       params: file,
+    });
+    uploadResult.on('httpUploadProgress', (tick) => {
+      console.log({tick})
     });
     uploadResult = await uploadResult.promise();
     console.log({uploadResult});

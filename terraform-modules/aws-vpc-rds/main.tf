@@ -1,6 +1,8 @@
 # create a VPC
 resource "aws_vpc" "vpc" {
   cidr_block = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support = true
 
   tags = {
     Name = "svelu-rds-vpc"
@@ -93,3 +95,28 @@ resource "aws_security_group" "rds" {
     Name = "svelu-rds-security-group"
   }
 }
+
+# resource "aws_vpc_endpoint" "s3" {
+#   vpc_id = aws_vpc.vpc.id
+#   service_name = "com.amazonaws.eu-central-1.s3"
+
+#   route_table_ids = [aws_vpc.vpc.main_route_table_id]
+# }
+
+# resource "aws_vpc_endpoint_policy" "example" {
+#   vpc_endpoint_id = aws_vpc_endpoint.s3.id
+#   policy = jsonencode({
+#   "Statement": [
+#     {
+#       "Sid": "Access-to-s3-buckets",
+#       "Principal": "*",
+#       "Action": [
+#         "s3:GetObject",
+#         "s3:PutObject"
+#       ],
+#       "Effect": "Allow",
+#       "Resource": ["arn:aws:s3:::/*/*"]
+#     }
+#   ]
+# }	)
+# }
