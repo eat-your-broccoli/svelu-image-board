@@ -15,15 +15,17 @@ export default () => {
 
 
     return (
-    <div class="header height">
-        <div class="header-block">SVELU</div>
-        {isLoggedIn &&
-            <UserInfo></UserInfo>
-        }
-        {isLoggedIn === false &&
-            <Login></Login>
-        }
-        
-    </div>
+    <>
+        <div className='header height30'>
+        <div className="header-block">SVELU</div>
+            {isLoggedIn &&
+                <UserInfo></UserInfo>
+            }
+            {isLoggedIn === false &&
+                <Login></Login>
+            }
+        </div>
+    </>
+    
     );
 }

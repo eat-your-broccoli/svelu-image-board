@@ -17,11 +17,9 @@ let User = null;
 
 exports.lambdaHandler = async function(event, context) {
   try {
-    console.log(event);
-    console.log(JSON.stringify(event));
     const body = extractBody(event);
     event.params = {...event.pathParameters, ...body, ...event.queryStringParameters};
-    event.user = extractUserIdFromJWT(event.requestContext.authorizer.jwt);
+    event.params.user = extractUserIdFromJWT(event.requestContext.authorizer.jwt);
     return await handler(event, context);
   } catch (err) {
     console.error({err});
@@ -34,6 +32,12 @@ async function handler(event, context) {
   try {
     let lastId = event.params.lastId;
     let pageSize = event.params.pageSize || 10;
+    pageSize = parseInt(pageSize);
+    if(pageSize === NaN) {
+      const err = new Error("pageSize is NaN");
+      err.statusCode = StatusCodes.BAD_REQ;
+      throw err;
+    }
     if(pageSize > 50) pageSize = 50;
     if(pageSize <= 0) pageSize = 1;
 
@@ -54,10 +58,11 @@ async function handler(event, context) {
       ]
     }
 
-    if(lastId != null && lastId !== 0) {
+    lastId = parseInt(lastId);
+    if(lastId != NaN && (lastId != null || lastId === 0)) {
       dbParam.where = {
         id: {
-          [Op.lt]: lastId,
+          [Op.lt]: parseInt(lastId),
         }
       }
     };
