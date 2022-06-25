@@ -22,14 +22,26 @@ provider "aws" {
 # ## S3 bucket for our website
 module "website_bucket_s3" {
   source = "./terraform-modules/aws-s3-website-bucket"
-
-
-  bucket_name = "website-bucket-s3"
+  bucket_name = "website-bucket-s3-sven"
   tags = {
     Name        = "Static Website Bucket"
     Environment = "Terraform"
   }
   html_source = "website/index.html"
+}
+
+module "media_buckets" {
+  source = "./terraform-modules/aws-s3-media"
+  bucket_name_media = "svelu-bucket-media"
+  tags_media = {
+    Name        = "Media Bucket"
+    Environment = "Terraform"
+  }
+  bucket_name_thumbnails = "svelu-bucket-thumbnails"
+  tags_thumbnails = {
+    Name        = "Thumbnail Bucket"
+    Environment = "Terraform"
+  }
 }
 
 module "vpc" {
@@ -56,7 +68,7 @@ module "rds" {
 # ### Lambda functions
 
 resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = "bucket-lambda-rds-migration"
+  bucket = "bucket-lambda-rds-migration-sven"
   acl           = "private"
   force_destroy = true
 }

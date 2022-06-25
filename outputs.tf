@@ -14,3 +14,12 @@ output "cognito_domain" {
 output "api_gateway_url" {
     value = module.api_gateway.url
 }
+
+output "media_bucket_url" {
+  value = module.media_buckets.media_bucket_url
+}
+
+output "thumbnails_bucket_url" {
+  value = module.media_buckets.thumbnails_bucket_url
+}
+

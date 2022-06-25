@@ -39,3 +39,5 @@ terraform.rc
 
 # todo files
 todo.md
+
+test-img/*
