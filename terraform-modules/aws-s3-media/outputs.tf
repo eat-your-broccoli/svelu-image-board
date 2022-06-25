@@ -10,3 +10,11 @@ output "thumbnails_bucket_url" {
 output "media_bucket_name" {
   value = aws_s3_bucket.media.bucket_regional_domain_name
 }
+
+output "bucket_arns" {
+  value = [aws_s3_bucket.media.arn, aws_s3_bucket.thumbnails.arn]
+}
+
+output "bucket_arns_for_policy" {
+  value = ["${aws_s3_bucket.media.arn}/*", "${aws_s3_bucket.thumbnails.arn}/*"]
+}

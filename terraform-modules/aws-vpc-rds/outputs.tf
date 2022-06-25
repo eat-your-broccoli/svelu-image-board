@@ -28,4 +28,6 @@ output "aws_security_group_rds_id" {
   sensitive   = true
 }
 
-
+output "main_route_table_id" {
+  value = aws_vpc.vpc.main_route_table_id
+}

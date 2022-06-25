@@ -45,13 +45,19 @@ module "media_buckets" {
 }
 
 module "vpc" {
-  depends_on = [
-    # module.media_buckets
-  ]
   source = "./terraform-modules/aws-vpc-rds"
-  # bucket_arns = module.media_buckets.bucket_arns
 }
 
+module "vpc_endpoint" {
+  source = "./terraform-modules/aws-vpc-endpoint"
+  depends_on = [
+    module.media_buckets,
+    module.vpc
+  ]
+  bucket_arns = module.media_buckets.bucket_arns_for_policy
+  vpc_id = module.vpc.vpc_id
+  main_route_table_id = module.vpc.main_route_table_id
+}
 
 # relational database service (storing posts, tags, comments)
 module "rds" {
