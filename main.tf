@@ -142,12 +142,18 @@ module lambdas {
       timeout = 20
       handler = "handleMediaUpload.lambdaHandler"
     }
+    CreateThumbnail = {
+      function_name = "CreateThumbnail"
+      timeout = 20
+      handler = "thumbnailGeneration.handler"
+    }
   }
 
   env_db_name = "${module.rds.rds_name}"
   env_db_pass = "${module.rds.rds_password}"
   env_db_user = "${module.rds.rds_user}"
   env_bucket_media = "${var.bucket_name_media}"
+  env_bucket_thumbnails = "${var.bucket_name_thumbnails}"
 
   env_db_address = "${module.rds.rds_address}"
   env_db_port =  "${module.rds.rds_port}"
@@ -157,6 +163,18 @@ module lambdas {
   aws_subnet_rds_ids = module.vpc.aws_subnet_rds_ids
   aws_security_group_rds_id = module.vpc.aws_security_group_rds_id
   vpc_security_group_default_id = module.vpc.vpc_security_group_default_id
+}
+
+module "media_bucket_triggers" {
+  depends_on = [
+    module.lambdas,
+    module.media_buckets
+  ]
+  source = "./terraform-modules/aws-s3-media-triggers"
+  lambda_thumbnail_func_name = lookup(module.lambdas.function_name, "CreateThumbnail")
+  lambda_thumbnail_arn = lookup(module.lambdas.arn, "CreateThumbnail")
+  bucket_media_arn = module.media_buckets.media_bucket_arn
+  bucket_media_id = var.bucket_name_media
 }
 
 module "api_gateway" {

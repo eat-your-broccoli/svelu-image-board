@@ -81,3 +81,10 @@ variable "env_bucket_media" {
   type = string
   description = "bucket name for the media bucket"
 }
+
+variable "env_bucket_thumbnails" {
+  type = string
+  description = "bucket name for the media bucket"
+}
+
+

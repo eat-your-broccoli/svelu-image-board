@@ -1,7 +1,9 @@
 // installing dependencies
 resource "null_resource" "lambda_dependencies" {
   provisioner "local-exec" {
-    command = "cd ${path.module}/../../rds-migrate && npm install"
+    # command = "cd ${path.module}/../../rds-migrate && npm install"
+    command = "cd ${path.module}/../../rds-migrate && rm -rf node_modules/sharp && npm install --arch=x64 --platform=linux sharp && npm install"
+    # yeah ... so basically sharp under windows != sharp under linux. so ... either we do this ... or there are no thumbnails :(
   }
 
   triggers = {
@@ -52,6 +54,7 @@ resource "aws_lambda_function" "lambda_function" {
       DB_PORT = var.env_db_port
       DB_HOST = var.env_db_address
       BUCKET_NAME_MEDIA = var.env_bucket_media
+      BUCKET_NAME_THUMBNAILS = var.env_bucket_thumbnails
     }
   }
 

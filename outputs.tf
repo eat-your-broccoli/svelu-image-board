@@ -22,4 +22,3 @@ output "media_bucket_url" {
 output "thumbnails_bucket_url" {
   value = module.media_buckets.thumbnails_bucket_url
 }
-
