@@ -1,43 +1,33 @@
-'use strict';
+const AWS = require('aws-sdk')
+const multipart = require('aws-lambda-multipart-parser')
+const s3 = new AWS.S3();
 
-const AWSXRay = require('aws-xray-sdk-core');
-const AWSSDK = require('aws-sdk');
-const {Sequelize, Op} = require('sequelize');
-const { loadSequelize } = require('./loadUmzug');
-const AWS = AWSXRay.captureAWS(AWSSDK);
-const StatusCodes = require('./StatusCodes');
-const { stringifyBody } = require('./helpers/stringifyBody');
-const { error2response } = require('./helpers/error2response');
-const { extractBody } = require('./helpers/extractBody');
-const { extractUserIdFromJWT } = require('./helpers/extractUserIdFromJWT');
-
-let sequelize = null;
-let Post = null;
-let User = null;
-
-exports.lambdaHandler = async function(event, context) {
-  try {
+exports.lambdaHandler = async (event) => {
     console.log(event);
-    console.log(JSON.stringify(event));
-    const body = extractBody(event);
-    event.params = {...event.pathParameters, ...body, ...event.queryStringParameters};
-    event.user = extractUserIdFromJWT(event.requestContext.authorizer.jwt);
-    return await handler(event, context);
-  } catch (err) {
-    console.error({err});
-    return stringifyBody(error2response(err));
+  const form = multipart.parse(event, false)
+  console.log({form});
+  // const s3_response = await upload_s3(form)
+  return {
+    statusCode: '200',
+    body: JSON.stringify({ success: true })
   }
-}
+};
 
-// Handler
-async function handler(event, context) {
-  try {
-    const response = {statusCode: StatusCodes.OKAY, body: {"foo": "bar"}};
-    return stringifyBody(response);
-    } catch(err) {
-      console.error({err});
-      return stringifyBody(error2response(err));
-    }
-}
+// const upload_s3 = async (form) => {
+//   const uniqueId = Math.random().toString(36).substr(2, 9);
+//   const key = `${uniqueId}_${form.image.filename}`
 
-exports.handler = handler;
+//   const request = {
+//     Bucket: 'bucket-name',
+//     Key: key,
+//     Body: form.image.content,
+//     ContentType: form.image.contentType,
+//   }
+//   try {
+//     const data = await s3.putObject(request).promise()
+//     return data
+//   } catch (e) {
+//     console.log('Error uploading to S3: ', e)
+//     return e
+//   }
+// }
