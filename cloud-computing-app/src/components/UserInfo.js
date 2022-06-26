@@ -8,6 +8,6 @@ export default () => {
 
 
     return (
-        <div class="header-block left-flex">Logged in as {username}    <button onClick={logout}>logout</button></div>
+        <div className="header-block left-flex">Logged in as {username}    <button onClick={logout}>logout</button></div>
     );
 }

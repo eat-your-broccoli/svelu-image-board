@@ -11,7 +11,6 @@ const axiosInstance = axios.create({
 
 export default function GetAxiosInstance() {
     const { getSession } = useContext(AccountContext);
-    console.log(axios.request.interceptors)
     axiosInstance.interceptors.request.use(async (request) => {
         const session = await getSession();
         request.headers.common['Authorization'] = session.headers.Authorization;

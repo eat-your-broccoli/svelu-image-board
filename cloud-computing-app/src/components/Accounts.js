@@ -17,22 +17,22 @@ const Account = (props) => {
             reject()
           } else {
             setUsername(user.username)
-            const attributes = await new Promise((resolve, reject) => {
-              user.getUserAttributes((err, attributes) => {
-                if (err) {
-                  reject(err)
-                } else {
-                  const results = {}
+            // const attributes = await new Promise((resolve, reject) => {
+            //   user.getUserAttributes((err, attributes) => {
+            //     if (err) {
+            //       reject(err)
+            //     } else {
+            //       const results = {}
 
-                  for (let attribute of attributes) {
-                    const { Name, Value } = attribute
-                    results[Name] = Value
-                  }
+            //       for (let attribute of attributes) {
+            //         const { Name, Value } = attribute
+            //         results[Name] = Value
+            //       }
 
-                  resolve(results)
-                }
-              })
-            })
+            //       resolve(results)
+            //     }
+            //   })
+            // })
 
             const token = session.getIdToken().getJwtToken()
             SetIsLoggedIn(true);
@@ -42,7 +42,7 @@ const Account = (props) => {
                 Authorization: token,
               },
               ...session,
-              ...attributes,
+              // ...attributes,
             })
           }
         })
