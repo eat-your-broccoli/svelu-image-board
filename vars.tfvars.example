@@ -4,3 +4,4 @@ bucket_name_website = "svelu-website-bucket"
 bucket_name_lambdas = "svelu-lambdas-bucket"
 cognito_domain = "svelu-auth"
 rds_root_password=
+rds_is_delete_protected = true

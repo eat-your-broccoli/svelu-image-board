@@ -35,10 +35,15 @@ const Posts = (props) => {
         
     }
 
+    const getPosts = () => {
+      return posts;
+    }
+
   return (
     <PostContext.Provider
       value={{
         posts,
+        getPosts,
         getNewPosts,
         setFocussedPost,
         focussedPost

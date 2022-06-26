@@ -6,27 +6,24 @@ import '../css/Overview.css'
 import PostView from './PostView';
 
 export default () => {
-    const {posts} = useContext(PostContext);
     let flyingRequest = false; // state to slow, need traditional var
-    let initialScroll = true;
     const [hasMorePosts, setHasMorePosts] = useState(true);
-    const { getNewPosts, focussedPost, setFocussedPost } = useContext(PostContext);
+    const { posts, getNewPosts, focussedPost, setFocussedPost } = useContext(PostContext);
 
     function getLastPostId() {
       if(posts.length === 0) return -1;
       return posts[posts.length-1].id;
     }
 
-    const loadNext = (event) => {
+    const loadNext = () => {
       try {
         if(hasMorePosts === false) return;
         if(flyingRequest === true) return;
         flyingRequest = (true);
         const params = {};
         params.lastId = getLastPostId();
-        params.pageSize = 10;
+        params.pageSize = 50;
         getNewPosts(params).then((response) => {
-          console.log({response})
           const newPosts = response.data.posts;
           const pageSize = response.data.pageSize;
           if(newPosts.length < pageSize) {
@@ -34,7 +31,6 @@ export default () => {
             setHasMorePosts(false);
           }
           flyingRequest = (false);
-          if(initialScroll && hasMorePosts) onLoaded(event);
         })
       } catch (err) {
         console.log({err});
@@ -49,16 +45,6 @@ export default () => {
     const openPost = (event) => {
       const postId = event.currentTarget.getAttribute("data-value");
       setFocussedPost(postId);
-    }
-
-    const onLoaded = () => {
-      const elem = document.getElementById("scrollableDiv");
-      const clientHeight = elem.clientHeight;
-      const scrollHeight = elem.scrollHeight;
-      const height = elem.height;
-      console.log({scrollHeight, clientHeight, height})
-      if(scrollHeight === clientHeight) setTimeout(() => loadNext(), 10);
-      else initialScroll = false;
     }
 
     return (
