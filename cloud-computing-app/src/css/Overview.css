@@ -1,0 +1,31 @@
+img {
+    border: none;
+    padding: 0px;
+    width: 128px;
+    height: 128px;
+  }
+
+.infinite-scroll {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 5px;
+    height: 80vh;
+}
+
+.thumbnail-container {
+    display: block;
+    min-width: 50px;
+    max-width: 150px;
+    height: auto;
+    margin: 5px;
+}
+
+.scroll-message-container {
+    width: 100%;
+}
+
+.break {
+    flex-basis: 100%;
+    height: 0;
+  }

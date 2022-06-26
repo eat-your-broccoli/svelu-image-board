@@ -9,7 +9,6 @@ const Posts = (props) => {
     const axios = GetAxiosInstance();
     const [posts, setPosts] = useState([]);
 
-
     const getNewPosts = async(params = {}) => {
         const lastId = params.lastId;
         const pageSize = params.pageSize || 15;
