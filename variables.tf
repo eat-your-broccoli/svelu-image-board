@@ -4,3 +4,6 @@ variable "bucket_name_website" {}
 variable "bucket_name_lambdas" {}
 variable "cognito_domain" {}
 variable "rds_root_password" {}
+variable "rds_is_delete_protected" {
+    default = false
+}

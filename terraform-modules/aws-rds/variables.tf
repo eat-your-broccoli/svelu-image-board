@@ -28,3 +28,8 @@ variable "aws_security_group_rds_id" {}
 variable "public" {
   default = false
 }
+
+variable "is_delete_protected" {
+  description = "if set to true rds will not be deleted"
+  type = bool
+}

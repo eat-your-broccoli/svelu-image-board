@@ -12,8 +12,7 @@ resource "aws_db_instance" "myDB" {
   // availability_zone    = "eu-central-1"
   publicly_accessible  = var.public
 
-  # db_subnet_group_name      = "${aws_db_subnet_group.default.id}"
-  # vpc_security_group_ids    = ["${aws_security_group.rds.id}"]
   db_subnet_group_name      = var.aws_db_subnet_group_default_id
   vpc_security_group_ids    = [var.aws_security_group_rds_id]
+  deletion_protection       = var.is_delete_protected # if set to true, rds will be kept even when terraform destroy used 
 }

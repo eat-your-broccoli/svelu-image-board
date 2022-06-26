@@ -64,15 +64,16 @@ module "rds" {
   depends_on = [
     module.vpc
   ]
- source = "./terraform-modules/aws-rds"
- rds_name = "myRDS"
- rds_user = "root"
- rds_password = var.rds_root_password
- rds_vpc_id = module.vpc.vpc_id
- vpc_security_group_default_id = module.vpc.vpc_security_group_default_id
+  source = "./terraform-modules/aws-rds"
+  rds_name = "myRDS"
+  rds_user = "root"
+  rds_password = var.rds_root_password
+  rds_vpc_id = module.vpc.vpc_id
+  vpc_security_group_default_id = module.vpc.vpc_security_group_default_id
   aws_db_subnet_group_default_id = module.vpc.aws_db_subnet_group_default_id
   aws_security_group_rds_id = module.vpc.aws_security_group_rds_id
   public = false
+  is_delete_protected = var.rds_is_delete_protected
 }
 
 # ### Lambda functions
