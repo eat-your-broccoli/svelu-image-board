@@ -10,7 +10,6 @@ img {
     flex-wrap: wrap;
     justify-content: center;
     margin: 5px;
-    height: 80vh;
 }
 
 .thumbnail-container {

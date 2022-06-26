@@ -8,6 +8,7 @@ const Posts = (props) => {
   
     const axios = GetAxiosInstance();
     const [posts, setPosts] = useState([]);
+    const [focussedPost, setFocussedPost] = useState(null);
 
     const getNewPosts = async(params = {}) => {
         const lastId = params.lastId;
@@ -38,7 +39,9 @@ const Posts = (props) => {
     <PostContext.Provider
       value={{
         posts,
-        getNewPosts
+        getNewPosts,
+        setFocussedPost,
+        focussedPost
       }}
     >
       {props.children}
