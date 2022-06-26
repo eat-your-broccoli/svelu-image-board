@@ -30,9 +30,10 @@ exports.lambdaHandler = async function(event, context) {
 // Handler
 async function handler(event, context) {
   try {
-    let lastId = event.params.lastId;
+    let lastId = event.params.lastId || -1;
     let pageSize = event.params.pageSize || 10;
     pageSize = parseInt(pageSize);
+    console.log({pageSize});
     if(pageSize === NaN) {
       const err = new Error("pageSize is NaN");
       err.statusCode = StatusCodes.BAD_REQ;
@@ -59,7 +60,8 @@ async function handler(event, context) {
     }
 
     lastId = parseInt(lastId);
-    if(lastId != NaN && (lastId != null || lastId === 0)) {
+    console.log({lastId}, lastId === NaN)
+    if((lastId !== NaN && lastId >= 0) && (lastId != null || lastId === 0)) {
       dbParam.where = {
         id: {
           [Op.lt]: parseInt(lastId),
@@ -71,7 +73,9 @@ async function handler(event, context) {
     const response = {
       statusCode: StatusCodes.OKAY,
       body: {
-        posts: posts
+        posts: posts,
+        pageSize,
+        lastId
       }
     }
     return stringifyBody(response);
