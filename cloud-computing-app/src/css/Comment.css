@@ -1,0 +1,11 @@
+.comment-container {
+    background-color: #1B1E1F;
+    border: none;
+    padding: 5px;
+    margin-bottom: 3px;
+}
+
+p {
+    padding: 0;
+    margin: 1px;
+}

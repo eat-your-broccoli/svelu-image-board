@@ -83,7 +83,7 @@ export default () => {
               >
               {posts.map((i, index) => (
                   <div className='thumbnail-container' key={index} onClick={openPost} data-value={i.id}>
-                    <img src={i.thumbnail} alt={"Thumbnail of post "+i.id}></img>
+                    <img className="img-thumb" src={i.thumbnail} alt={"Thumbnail of post "+i.id}></img>
                   </div>
                 ))}
           </InfiniteScroll>

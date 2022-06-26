@@ -1,0 +1,29 @@
+.post-view-container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 10px;
+    padding-top: 5px;
+    margin-top: 10px;
+}
+
+.img-container {
+    display: flex;
+    align-content: center;
+    align-items: center;
+}
+
+.img-view {
+    max-width: 80%;
+    max-height: 50vh;
+    margin: 0 auto;
+}
+
+.block {
+    background-color: rgba(0,0,0,0.10);
+    margin-bottom: 10px;
+}
+
+.comments-container {
+    padding-left: 10px;
+    padding-right: 10px;
+}
