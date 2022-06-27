@@ -43,6 +43,7 @@ const Posts = (props) => {
     <PostContext.Provider
       value={{
         posts,
+        setPosts,
         getPosts,
         getNewPosts,
         setFocussedPost,

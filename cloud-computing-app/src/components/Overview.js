@@ -8,7 +8,7 @@ import PostView from './PostView';
 export default () => {
     let flyingRequest = false; // state to slow, need traditional var
     const [hasMorePosts, setHasMorePosts] = useState(true);
-    const { posts, getNewPosts, focussedPost, setFocussedPost } = useContext(PostContext);
+    const { posts, setPosts, getNewPosts, focussedPost, setFocussedPost} = useContext(PostContext);
 
     function getLastPostId() {
       if(posts.length === 0) return -1;
@@ -38,6 +38,12 @@ export default () => {
       }
     } 
 
+    const refresh = () => {
+      setHasMorePosts(true);
+      setPosts([]);
+      loadNext();
+    }
+
     useEffect(() => {
       if(posts.length === 0) loadNext()
     }, [posts]);
@@ -58,8 +64,7 @@ export default () => {
             display: 'flex',
             flexDirection: 'column',
           }}
-        >
-          
+        >          
           <InfiniteScroll
               scrollableTarget="scrollableDiv"
               id="myScrollyMcScroll"
@@ -80,6 +85,19 @@ export default () => {
                   </p>
                 </div>
               }
+              pullDownToRefresh={true}
+              refreshFunction={refresh}
+              pullDownToRefreshThreshold={100}
+              pullDownToRefreshContent={
+                <div style={{dispay: 'flex', justifyContent: 'center', textAlign: 'center', width: '100%'}}>
+                  <h3>&#8595; Pull down to refresh</h3>
+                </div>
+              }
+              releaseToRefreshContent={
+                <div style={{dispay: 'flex', justifyContent: 'center', textAlign: 'center', width: '100%'}}>
+                  <h3>&#8595; Release to refresh</h3>
+                </div>
+              }
               >
               {posts.map((i, index) => (
                   <div className='thumbnail-container' key={index} onClick={openPost} data-value={i.id}>
@@ -92,6 +110,7 @@ export default () => {
       {focussedPost &&
         <PostView></PostView>
       }
+
     </>
   );
 };

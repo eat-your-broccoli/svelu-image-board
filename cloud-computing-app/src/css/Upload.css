@@ -1,0 +1,45 @@
+.upload-headline {
+    margin: 0 auto;
+}
+
+label {
+    padding-right: 5px;
+}
+
+.upload-container {
+    display: flex;
+    flex-direction: column;
+    min-width: 400px;
+    max-width: 800px;
+    width: 50vw;
+    margin: 0 auto;
+}
+
+.upload-label {
+    width: 40px;
+}
+
+.upload-input {
+    width: 70%;
+
+}
+
+.upload-image-input {
+    visibility: hidden;
+    width: 0;
+    height: 0;
+}
+
+.upload-title {
+    border: 0;
+    margin-bottom: 10px;
+}
+
+.upload-input {
+    border: none;
+}
+
+.upload-preview {
+    max-width: 50vw;
+    margin: 10px auto;
+}
