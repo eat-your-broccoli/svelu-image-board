@@ -68,13 +68,13 @@ resource "aws_subnet" "rds" {
 }
 
 resource "aws_db_subnet_group" "default" {
-  name        = "svelu-rds-subnet-group"
+  name        = "svelu-rds-subnet-group_"
   description = "Terraform example RDS subnet group"
   subnet_ids  = flatten(["${aws_subnet.rds.*.id}"]) # flatten the nested array caused by .*.id
 }
 
 resource "aws_security_group" "rds" {
-  name        = "svelu_rds_security_group"
+  name        = "svelu_rds_security_group_"
   description = "Terraform example RDS MySQL server"
   vpc_id      = aws_vpc.vpc.id
   # Keep the instance private by only allowing traffic from the web server.
