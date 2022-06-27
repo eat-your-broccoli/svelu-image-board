@@ -1,0 +1,10 @@
+{
+    "post": {
+        "get": "posts",
+        "post": "post"
+    },
+    "comment": {
+        "get": "post/{post}/comments",
+        "post": "post/{post}/comment"
+    }
+}

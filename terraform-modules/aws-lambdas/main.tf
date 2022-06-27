@@ -7,7 +7,7 @@ resource "null_resource" "lambda_dependencies" {
   }
 
   triggers = {
-    # runs_always = "${timestamp()}" // executes every time because timestamp changes
+    runs_always = "${timestamp()}" // executes every time because timestamp changes
   }
 }
 
