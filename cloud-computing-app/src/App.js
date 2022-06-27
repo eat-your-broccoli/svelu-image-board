@@ -4,6 +4,7 @@ import GetPosts from './components/GetPosts';
 import Header from './components/Header';
 import Overview from './components/Overview';
 import { Posts } from './components/PostContext';
+import Router from './components/Router';
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default () => {
@@ -11,7 +12,7 @@ export default () => {
     <Account>
       <Header></Header>
       <Posts>
-        <Overview></Overview>
+        <Router></Router>
       </Posts>
     </Account>
   );

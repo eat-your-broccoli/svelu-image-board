@@ -6,6 +6,7 @@ const AccountContext = createContext()
 
 const Account = (props) => {
   const [username, setUsername] = useState('');
+  const [isUpload, setIsUpload] = useState(false);
   const [isLoggedIn, SetIsLoggedIn] = useState(false);
   
   const getSession = async () => {
@@ -17,23 +18,6 @@ const Account = (props) => {
             reject()
           } else {
             setUsername(user.username)
-            // const attributes = await new Promise((resolve, reject) => {
-            //   user.getUserAttributes((err, attributes) => {
-            //     if (err) {
-            //       reject(err)
-            //     } else {
-            //       const results = {}
-
-            //       for (let attribute of attributes) {
-            //         const { Name, Value } = attribute
-            //         results[Name] = Value
-            //       }
-
-            //       resolve(results)
-            //     }
-            //   })
-            // })
-
             const token = session.getIdToken().getJwtToken()
             SetIsLoggedIn(true);
             resolve({
@@ -104,6 +88,8 @@ const Account = (props) => {
         authenticate,
         getSession,
         logout,
+        isUpload,
+        setIsUpload,
       }}
     >
       {props.children}
