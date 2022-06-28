@@ -1,13 +1,13 @@
 var assert = require('assert');
 require('dotenv').config();
 
-const createComment =require('../createComment');
-const {handler: createUser} =require('../createUser');
-const { deleteCommentByUser } = require('../helpers/deleteComment');
-const { deleteUser, deleteUserByName } = require('../helpers/deleteUser');
+const createComment =require('../src/createComment');
+const {handler: createUser} =require('../src/createUser');
+const { deleteCommentByUser } = require('../src/helpers/deleteComment');
+const { deleteUser, deleteUserByName } = require('../src/helpers/deleteUser');
 
-const {handler: createPost} =require('../createPost');
-const { extractBody } = require('../helpers/extractBody');
+const {handler: createPost} =require('../src/createPost');
+const { extractBody } = require('../src/helpers/extractBody');
 let user;
 const username = "test-user-comment";
 

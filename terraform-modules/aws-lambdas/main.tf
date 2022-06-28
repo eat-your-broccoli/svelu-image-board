@@ -2,12 +2,12 @@
 locals {
   packageJSON_sha1  = sha1(join("", [for f in fileset(path.root, "${var.src_path}/package*.json") : filesha1(f)]))
   node_modules_sha1 = sha1(join("", [for f in fileset(path.root, "${var.src_path}/node_modules/**") : filesha1(f)]))
+  src_dir_sha1 = sha1(join("", [for f in fileset(path.root, "${var.src_path}/src/**") : filesha1(f)]))
 }
 
 // installing dependencies
 resource "null_resource" "lambda_dependencies" {
   provisioner "local-exec" {
-    # command = "cd ${path.module}/../../rds-migrate && npm install"
     command = "cd ${var.src_path} && rm -rf node_modules/sharp && npm install --arch=x64 --platform=linux sharp && npm install"
     # yeah ... so basically sharp under windows != sharp under linux. so ... either we do this ... or there are no thumbnails :(
   }
@@ -29,6 +29,7 @@ data "archive_file" "archive" {
 
   source_dir  = "${var.src_path}"
   output_path = "${var.out_path}${var.file_key}"
+  excludes = ["test/", ".env", ".env.example", "docker-compose.yml"]
   depends_on = [
     null_resource.lambda_dependencies
   ]
@@ -47,6 +48,7 @@ resource "null_resource" "remove_and_upload_to_s3" {
   triggers = {
     packageJSON_sha1 = local.packageJSON_sha1
     node_modules_sha1 = local.node_modules_sha1
+    src_dir_sha1 = local.
   }
 }
 
@@ -58,7 +60,7 @@ resource "aws_lambda_function" "lambda_function" {
   s3_key    = var.file_key
 
   runtime = "nodejs14.x"
-  handler = each.value.handler
+  handler = "src/${each.value.handler}"
 
   timeout = each.value.timeout
 
