@@ -18,7 +18,7 @@ services:
       - ${MYSQL_PORT}:3306
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWD}
-      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_DATABASE=svelu
     networks:
       - db
   phpmyadmin:

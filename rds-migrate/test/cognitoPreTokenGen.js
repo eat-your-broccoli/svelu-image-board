@@ -1,11 +1,11 @@
 var assert = require('assert');
 require('dotenv').config();
 
-const {handler: cognitoPreTokenGen} =require('../src/cognitoPreTokenGen');
-const { deleteUser, deleteUserByName } = require('../src/helpers/deleteUser');
-const {handler: createUser} =require('../src/createUser');
+const {handler: cognitoPreTokenGen} =require('../cognitoPreTokenGen');
+const { deleteUser, deleteUserByName } = require('../helpers/deleteUser');
+const {handler: createUser} =require('../createUser');
 
-const { extractBody } = require('../src/helpers/extractBody');
+const { extractBody } = require('../helpers/extractBody');
 let user;
 const username = "test-user-pretokengen";
 const email = username + "@example.com"
