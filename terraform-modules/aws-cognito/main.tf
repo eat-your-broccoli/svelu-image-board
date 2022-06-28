@@ -4,6 +4,7 @@ resource "aws_cognito_user_pool" "user_pool" {
   auto_verified_attributes = [ "email" ]
   password_policy {
     minimum_length = 10
+    temporary_password_validity_days = 7
   }
   verification_message_template {
     default_email_option = "CONFIRM_WITH_LINK"

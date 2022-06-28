@@ -16,18 +16,25 @@ terraform {
 
 provider "aws" {
   profile = "default"
-  region  = "eu-central-1"
+  region  = var.region
 }
+
+data "aws_region" "current" {}
 
 # ## S3 bucket for our website
 module "website_bucket_s3" {
+  depends_on = [
+    module.cognito, # we need to wait for cognito for the user pool id
+    module.api_gateway # we need to wait for api_gateway for the url to the endpoint
+  ]
   source = "./terraform-modules/aws-s3-website-bucket"
   bucket_name = var.bucket_name_website
   tags = {
     Name        = "Static Website Bucket"
     Environment = "Terraform"
   }
-  html_source = "website/index.html"
+  app_path    = "./cloud-computing-app"
+  out_path    = "./cloud-computing-app/build"
 }
 
 module "media_buckets" {
@@ -94,7 +101,7 @@ module lambdas {
   source      = "./terraform-modules/aws-lambdas"
   bucket_id = aws_s3_bucket.lambda_bucket.id
   src_path    = "./rds-migrate"
-  out_path    = "./terraform-modules/aws-lambdas/api/lambdas-api.zip"
+  out_path    = "./terraform-modules/aws-lambdas/api/"
   file_key    = "lambdas-api.zip"
 
   lambdas = {
@@ -190,6 +197,8 @@ module "media_bucket_triggers" {
   bucket_thumbnails_id = var.bucket_name_thumbnails
 }
 
+
+
 module "api_gateway" {
   depends_on = [
     module.lambdas,
@@ -226,6 +235,7 @@ module "api_gateway" {
   }
   cognito_user_pool_client_id = module.cognito.cognito_ClientID
   cognito_user_pool_endpoint = module.cognito.cognito_domain
+  CORS_allowed_origins = concat(var.cors_local_dev, ["https://${var.bucket_name_website}.s3.${var.region}.amazonaws.com", "https://${var.bucket_name_website}.s3.${var.region}.amazonaws.com/"])
 }
 
 
@@ -239,7 +249,7 @@ module "lambda_rds_migration_invocation" {
 
 module "cognito" {
   depends_on = [
-    module.lambdas
+    module.lambdas #some lambdas are triggered by cognito actions
   ]
   source = "./terraform-modules/aws-cognito"
   post_confirmation_lambda_arn = lookup(module.lambdas.arn, "CognitoPostConfirmationLambda")

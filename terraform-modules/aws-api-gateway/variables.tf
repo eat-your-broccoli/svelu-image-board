@@ -8,3 +8,7 @@ variable "api_gateways" {
 }
 variable "cognito_user_pool_client_id" {}
 variable "cognito_user_pool_endpoint" {}
+
+variable "CORS_allowed_origins" {
+    type=list(string)
+}
