@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha --jobs 1",
     "test-one": "mocha -f 'cognitoPreTokenGen' --jobs 1",
-    "setup": "node ./setup.js"
+    "setup": "node src/setup.js"
   },
   "author": "",
   "license": "ISC",
