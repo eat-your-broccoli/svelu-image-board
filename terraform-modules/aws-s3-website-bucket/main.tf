@@ -57,7 +57,10 @@ resource "aws_s3_bucket_policy" "publicRead" {
 
 locals {
   packageJSON_sha1  = sha1(filesha1("${var.app_path}/package.json"))
-  node_modules_sha1 = sha1(join("", [for f in fileset(path.root, "${var.app_path}/node_modules/**") : filesha1(f)]))
+  # npm does not produce deterministic hash results
+  # e.g. changed hash triggers npm install, which changes hash, which triggers npm install, changes hash ... ... ... 
+  # that's why we only count files
+  node_modules_sha1 = length(fileset(path.root, "${var.app_path}/node_modules/**"))
   dir_sha1    = sha1(join("", [for f in fileset(path.root, "${var.app_path}/src/**") : filesha1(f)]))
   dir_public_sha1 = sha1(join("", [for f in fileset(path.root, "${var.app_path}/public/**") : filesha1(f)]))
   dir_dist_sha1 = sha1(join("", [for f in fileset(path.root, "${var.app_path}/build/**") : filesha1(f)]))

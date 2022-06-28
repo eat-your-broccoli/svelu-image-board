@@ -100,7 +100,7 @@ module lambdas {
 
   source      = "./terraform-modules/aws-lambdas"
   bucket_id = aws_s3_bucket.lambda_bucket.id
-  src_path    = "./rds-migrate"
+  src_path    = "./lambdas"
   out_path    = "./terraform-modules/aws-lambdas/api/"
   file_key    = "lambdas-api.zip"
 
