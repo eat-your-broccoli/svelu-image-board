@@ -9,7 +9,13 @@ variable "tags" {
     default = {}
 }
 
-variable "html_source" {
-  description = "Source path to the html souce, e.g Dir/index.html"
+variable "app_path" {
+  description = "path to the app, here npm run build will be executed"
   type = string
 }
+
+variable "out_path" {
+  description = "path to the build app"
+  type = string
+}
+

@@ -18,15 +18,12 @@ resource "aws_s3_bucket_website_configuration" "site-config" {
   }
 
   error_document {
-    key = "error.html"
+    key = "index.html"
   }
 
   routing_rule {
-    condition {
-      key_prefix_equals = "/"
-    }
     redirect {
-      replace_key_prefix_with = "index.html"
+      replace_key_prefix_with = "/index.html"
     }
   }
 }
@@ -56,13 +53,55 @@ resource "aws_s3_bucket_policy" "publicRead" {
   })
 }
 
-# indexfile for the aws s3 bucket
-resource "aws_s3_bucket_object" "indexfile" {
-  bucket = aws_s3_bucket.website.id
-  key = "index.html"
-  acl = "public-read"
-  source = var.html_source
-  content_type = "text/html"
 
-  etag = filemd5(var.html_source)
+
+locals {
+  packageJSON_sha1  = sha1(filesha1("${var.app_path}/package.json"))
+  node_modules_sha1 = sha1(join("", [for f in fileset(path.root, "${var.app_path}/node_modules/**") : filesha1(f)]))
+  dir_sha1    = sha1(join("", [for f in fileset(path.root, "${var.app_path}/src/**") : filesha1(f)]))
+  dir_public_sha1 = sha1(join("", [for f in fileset(path.root, "${var.app_path}/public/**") : filesha1(f)]))
+  dir_dist_sha1 = sha1(join("", [for f in fileset(path.root, "${var.app_path}/build/**") : filesha1(f)]))
+}
+
+// installing dependencies
+resource "null_resource" "npm_dependencies" {
+  provisioner "local-exec" {
+    command = "cd ${var.app_path} && npm install"
+  }
+
+  triggers = {
+    # runs_always = "${timestamp()}" // executes every time because timestamp changes
+    dir_node_modules    = local.node_modules_sha1
+    packageJSON_sha1    = local.packageJSON_sha1
+  }
+}
+
+// building app dependencies
+resource "null_resource" "build_app" {
+  depends_on = [
+    null_resource.npm_dependencies
+  ]
+  provisioner "local-exec" {
+    command = "cd ${var.app_path} && npm run build"
+  }
+
+  triggers = {
+    #runs_always = "${timestamp()}" // executes every time because timestamp changes
+    dir_sha1    = local.dir_sha1
+    dir_public_sha1    = local.dir_public_sha1
+    dir_node_modules    = local.node_modules_sha1
+  }
+}
+
+resource "null_resource" "remove_and_upload_to_s3" {
+  depends_on = [
+    aws_s3_bucket.website,
+    null_resource.build_app
+  ]
+  provisioner "local-exec" {
+    command = "aws s3 sync ${var.out_path} s3://${aws_s3_bucket.website.id}"
+  }
+  triggers = {
+    dir_dist_sha1 = local.dir_dist_sha1
+  }
 }
