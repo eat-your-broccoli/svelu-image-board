@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>Image Upload</h1>
+        <!--- php?
+                    <form action="/action_page.php">
+            --->
+            <!-- action: aws bucket action: http:examplebucket.s3.amazoneaws.com http:examplebucket.s3.amazoneaws.com            -->
+            <form action="" >
+            <label for="img_title">Image title:</label>
+            <input type="text" id="img_title" name="img_title" maxlength="20">
+            <br>
+            <label for="img">Select Image:</label>
+            <input type="file" id="img" name="img" accept="image/*" onchange="readURL(this);">
+            <img id="img_upload_show" src="#" alt="your img"/>
+            <br>
+            <input accept="imgage/*"type='file' id="imgInp">
+            <img id="blah" src="#" alt="your img"/>
+            <br>
+            <label for="img_description">Image description:</label>
+            <input type="text" id="img_description" name="img_description" maxlength="200">
+            <br>
+            <input type="checkbox" id="img_tag_1" name="animal">
+            <label for="img_tag_1">animal</label>
+            <br>
+            <input type="checkbox" id="img_tag_2" name="person">
+            <label for="img_tag_2">person</label>
+            <br>
+            <input type="checkbox" id="img_tag_3" name="sport">
+            <label for="img_tag_3">sport</label>
+            <br>
+            <input type="checkbox" id="img_tag_4" name="meme">
+            <label for="img_tag_4">meme</label>
+            <br>
+            <input type="checkbox" id="img_tag_5" name="funny">
+            <label for="img_tag_5">funny</label>
+            <br>
+            <input type="submit">
+        </form>
+        <form id="form1" runat="server">
+            <input type='file' id="imgInp" />
+            <img id="blah" src="#" alt="your image" />
+         </form>
+         <img id="uploadPreview" style="width: 100px; height: 100px;" />
+<input id="uploadImage" type="file" name="myPhoto" onchange="PreviewImage();" />    
+        <script>
+            
+            imgInp.onchange = evt =>{
+                const [file] = img.files
+                if (file){
+                    blah.src=URL.createObjectURL(file)
+                }
+            }
+            function readURL(input){
+                if(input.files && input.files[0]{
+                    var reader = new FileReader();
+                    reader.onload = function (e){
+                        $('#img_upload_show').attr('srx',e.target.result).width(150).height(200);
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+            function PreviewImage() {
+        var oFReader = new FileReader();
+        oFReader.readAsDataURL(document.getElementById("uploadImage").files[0]);
+
+        oFReader.onload = function (oFREvent) {
+            document.getElementById("uploadPreview").src = oFREvent.target.result;
+        };
+    };
+        </script>
+    </body>
+</html>

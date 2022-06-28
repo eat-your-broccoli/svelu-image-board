@@ -3,14 +3,14 @@
 var assert = require('assert');
 require('dotenv').config();
 
-const {handler: createUser} =require('../src/createUser');
-const {handler: createPost} =require('../src/createPost');
-const {handler: getPosts} =require('../src/getPosts');
+const {handler: createUser} =require('../createUser');
+const {handler: createPost} =require('../createPost');
+const {handler: getPosts} =require('../getPosts');
 
 
-const { deleteUserByName, deleteUser } = require('../src/helpers/deleteUser');
+const { deleteUserByName, deleteUser } = require('../helpers/deleteUser');
 const { getHeapCodeStatistics } = require('v8');
-const { extractBody } = require('../src/helpers/extractBody');
+const { extractBody } = require('../helpers/extractBody');
 
 let user;
 
