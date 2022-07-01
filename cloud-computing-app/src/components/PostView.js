@@ -9,26 +9,26 @@ import CommentWrite from './CommentWrite';
 import Comment from './Comment';
 
 export default (props) => {
-    const {focussedPost, setFocussedPost, posts} = useContext(PostContext);
+    const {focussedPost, setFocussedPost} = useContext(PostContext);
     const [comments, setComments] = useState([]);
     const [commentsLoaded, setCommentsLoaded] = useState(false);
+    const [post, setPost] = useState(null);
     
 
     const axios = GetAxiosInstance();  
-
-    const post = posts.find((p) => {
-        return p.id = focussedPost;
-    })
     
     useEffect(() => {
-        loadComments()
-      }, []);
+        loadComments();
+        setPost(focussedPost);
+        console.log({post})
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [setPost]);
 
     const loadComments = () => {
         const requestConfig = {
 
         };
-        const route = routes.comment.get.replace('{post}', focussedPost);
+        const route = routes.comment.get.replace('{post}', focussedPost.id);
         axios.get(route, requestConfig)
                 .then(result => {
                     const {comments} = result.data;
@@ -47,7 +47,7 @@ export default (props) => {
     return (
     <div className="post-view-container">
         <button style={{float: 'right'}}onClick={closePostView}> X </button>
-        {post &&
+        { post != null &&
             <>            
             <div className="block">
                 <h2 style={{textAlign: 'center'}}>{post.title}</h2>
@@ -77,7 +77,7 @@ export default (props) => {
                 {commentsLoaded === false && comments.length === 0 && 
                     <p> loading comments ... </p>
                 }
-                <CommentWrite postId={focussedPost}></CommentWrite>
+                <CommentWrite postId={focussedPost.id}></CommentWrite>
             </div>
             </>
         }

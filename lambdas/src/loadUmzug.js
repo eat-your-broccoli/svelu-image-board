@@ -57,6 +57,7 @@ async function loadSequelize(params) {
         db[modelName].associate(db);
       }
     });
+    console.log({models})
     sequelize._models = db;
 
     return sequelize;

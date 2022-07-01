@@ -46,11 +46,13 @@ export default () => {
 
     useEffect(() => {
       if(posts.length === 0) loadNext()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [posts]);
 
     const openPost = (event) => {
       const postId = event.currentTarget.getAttribute("data-value");
-      setFocussedPost(postId);
+      const myPost = posts.find(p => p.id === parseInt(postId))
+      setFocussedPost(myPost);
     }
 
     return (

@@ -1,5 +1,5 @@
 /* eslint-disable import/no-anonymous-default-export */
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import '../css/Header.css'
 import { AccountContext } from './Accounts';
 export default () => {

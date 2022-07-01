@@ -17,7 +17,8 @@ exports.handler = async function(event, context) {
 
   const umzug = await loadUmzug(params);
   return new Promise(async resolve => {
-    await umzug.up();
+    const response = await umzug.up();
+    console.log({response});
     resolve({success: true});
   })
 }

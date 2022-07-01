@@ -90,5 +90,7 @@ variable "env_bucket_thumbnails" {
 variable "env_bucket_media_url" {}
 variable "env_bucket_thumbnails_url" {}
 
-
+variable "archive_hash" {
+  
+}
 

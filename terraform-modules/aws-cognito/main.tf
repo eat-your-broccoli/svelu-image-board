@@ -39,16 +39,6 @@ resource "aws_cognito_identity_pool" "main" {
     allow_classic_flow               = false
 }
 
-resource "aws_cognito_user" "test-user" {
-  user_pool_id = aws_cognito_user_pool.user_pool.id
-  username     = "test-user"
-
-  attributes = {
-    email          = "lgoettle@stud.hs-heilbronn.de"
-    email_verified = true
-  }
-}
-
 resource "aws_cognito_user_pool_domain" "main" {
   domain       = var.cognito_domain
   user_pool_id = aws_cognito_user_pool.user_pool.id

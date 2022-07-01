@@ -118,7 +118,7 @@ export default () => {
         <br/>
         <div className="upload-preview">
           {
-            <img key={"image"} src={imageURLs} width="200" height="auto" />
+            <img key={"image"} src={imageURLs} width="200" height="auto" alt="preview of content to be uploaded"/>
           }
         </div>
         <br />
