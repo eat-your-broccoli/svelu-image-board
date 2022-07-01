@@ -11,11 +11,14 @@ terraform {
     }
   }
 
+  backend "http" {
+  }
   required_version = ">= 0.14.9"
 }
 
 provider "aws" {
-  profile = "default"
+  # https://discuss.hashicorp.com/t/error-error-configuring-terraform-aws-provider-failed-to-get-shared-config-profile-default/39417
+  # profile = var.pipeline ? "" : "default"
   region  = var.region
 }
 
@@ -53,6 +56,7 @@ module "media_buckets" {
 
 module "vpc" {
   source = "./terraform-modules/aws-vpc-rds"
+  db_subnet_group_name = var.db_subnet_group_name
 }
 
 module "vpc_endpoint" {
@@ -91,8 +95,20 @@ resource "aws_s3_bucket" "lambda_bucket" {
   force_destroy = true
 }
 
+module "lambda_upload" {
+  depends_on = [
+    aws_s3_bucket.lambda_bucket
+  ]
+  source      = "./terraform-modules/aws-lambda-upload"
+  bucket_id = aws_s3_bucket.lambda_bucket.id
+  src_path    = "./lambdas"
+  out_path    = "./terraform-modules/aws-lambdas/api/"
+  file_key    = "lambdas-api.zip"
+}
+
 module lambdas {
   depends_on = [
+    module.lambda_upload,
     module.rds,
     module.vpc,
     module.media_buckets
@@ -102,7 +118,8 @@ module lambdas {
   bucket_id = aws_s3_bucket.lambda_bucket.id
   src_path    = "./lambdas"
   out_path    = "./terraform-modules/aws-lambdas/api/"
-  file_key    = "lambdas-api.zip"
+  file_key    = module.lambda_upload.file_key
+  archive_hash = module.lambda_upload.archive_hash
 
   lambdas = {
     GetPosts = {

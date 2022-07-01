@@ -18,3 +18,13 @@ variable "region" {
   type=string
   default = "eu-central-1"
 }
+
+variable "pipeline" {
+  description = "does this job run in a pipeline"
+  default = false
+}
+
+variable "db_subnet_group_name" {
+  default = "sevlu-rds-subnet-group"
+  description = "the subnet group for the rds"
+}

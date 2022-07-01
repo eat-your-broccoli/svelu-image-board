@@ -1,8 +1,6 @@
 import React from 'react';
 import { Account } from './components/Accounts';
-import GetPosts from './components/GetPosts';
 import Header from './components/Header';
-import Overview from './components/Overview';
 import { Posts } from './components/PostContext';
 import Router from './components/Router';
 

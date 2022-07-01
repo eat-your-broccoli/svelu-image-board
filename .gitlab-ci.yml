@@ -1,0 +1,114 @@
+# taken from 
+image: 
+  name: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+      - 'AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}' 
+      - 'AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}' 
+      - 'AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}'
+    
+variables:
+    TF_ROOT: ${CI_PROJECT_DIR}/
+    TF_STATE_NAME: ${TF_STATE_NAME:-default}
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${CI_PROJECT_NAME}
+    
+cache:
+  key: "${TF_ROOT}"
+  paths:
+    - ${TF_ROOT}/.terraform/
+    - "$(pwd)/ci.auto.tfvars"
+
+        
+before_script:
+  - cd ${TF_ROOT}
+
+stages:
+  - init
+  - validate
+  - plan
+  - deploy
+  - destroy
+
+init:
+  stage: init
+  script:
+    - gitlab-terraform init
+    - cp $PRODTFVARS "$(pwd)/ci.auto.tfvars"
+  artifacts:
+    paths: 
+      - "$(pwd)/ci.auto.tfvars"
+      - ${TF_ROOT}/plan.cache
+    reports:
+      terraform: ${TF_ROOT}/plan.json
+  only:
+    - main
+    - develop
+    - 15-setup-ci-cd-pipeline
+
+
+validate:
+  stage: validate
+  script:
+    - gitlab-terraform validate
+    - ls
+  only:
+    - develop
+    - main 
+    - 15-setup-ci-cd-pipeline
+
+plan:
+  stage: plan
+  script:
+    - gitlab-terraform plan
+    - gitlab-terraform plan-json
+  resource_group: ${TF_STATE_NAME}
+  artifacts:
+    name: plan
+    paths:
+      - ${TF_ROOT}/build/*
+      - ${TF_ROOT}/plan.cache
+    reports:
+      terraform: ${TF_ROOT}/plan.json
+  only:
+    - develop
+    - main 
+    - 15-setup-ci-cd-pipeline
+
+deploy:
+  stage: deploy
+  script:
+    - apk add --update npm 
+    - npm --version
+    - apk add --no-cache aws-cli
+    - aws --version
+    - gitlab-terraform apply
+  resource_group: ${TF_STATE_NAME}
+  artifacts:
+    name: plan
+    paths:
+      - ${TF_ROOT}/plan.cache
+      - ${TF_ROOT}/build/*
+      - ${TF_ROOT}/terraform-modules/aws-lambdas/api/*
+    reports:
+      terraform: ${TF_ROOT}/plan.json
+  rules:
+    - when: manual
+
+destroy:
+  stage: destroy
+  script:
+    - gitlab-terraform destroy
+  resource_group: ${TF_STATE_NAME}
+  artifacts:
+    name: plan
+    paths:
+      - ${TF_ROOT}/plan.cache
+      - ${TF_ROOT}/build/*
+    reports:
+      terraform: ${TF_ROOT}/plan.json
+  rules:
+    - when: manual
+
+
+ 

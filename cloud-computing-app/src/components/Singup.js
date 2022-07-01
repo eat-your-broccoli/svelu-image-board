@@ -25,7 +25,7 @@ export default () => {
       if(email == null || email.length === 0) throw new Error("please enter a valid email");
       if(email && email.length && email !== emailRepeat) throw new Error("emails don't match");
       if(password == null || password.length === 0) throw new Error("please enter a secure password");
-      if (password != passwordRepeat) throw new Error("password don't match");
+      if (password !== passwordRepeat) throw new Error("password don't match");
     } catch (err) {
       setErrorText(err.message);
       return;

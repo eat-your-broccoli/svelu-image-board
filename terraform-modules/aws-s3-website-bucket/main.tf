@@ -56,14 +56,14 @@ resource "aws_s3_bucket_policy" "publicRead" {
 
 
 locals {
-  packageJSON_sha1  = sha1(filesha1("${var.app_path}/package.json"))
+  website_packageJSON_sha1  = sha1(filesha1("${var.app_path}/package.json"))
   # npm does not produce deterministic hash results
   # e.g. changed hash triggers npm install, which changes hash, which triggers npm install, changes hash ... ... ... 
   # that's why we only count files
-  node_modules_sha1 = length(fileset(path.root, "${var.app_path}/node_modules/**"))
-  dir_sha1    = sha1(join("", [for f in fileset(path.root, "${var.app_path}/src/**") : filesha1(f)]))
-  dir_public_sha1 = sha1(join("", [for f in fileset(path.root, "${var.app_path}/public/**") : filesha1(f)]))
-  dir_dist_sha1 = sha1(join("", [for f in fileset(path.root, "${var.app_path}/build/**") : filesha1(f)]))
+  website_node_modules_sha1 = length(fileset(path.root, "${var.app_path}/node_modules/**"))
+  website_dir_sha1    = sha1(join("", [for f in fileset(path.root, "${var.app_path}/src/**") : filesha1(f)]))
+  website_dir_public_sha1 = sha1(join("", [for f in fileset(path.root, "${var.app_path}/public/**") : filesha1(f)]))
+  website_dir_dist_sha1 = sha1(join("", [for f in fileset(path.root, "${var.app_path}/build/**") : filesha1(f)]))
 }
 
 // installing dependencies
@@ -73,9 +73,9 @@ resource "null_resource" "npm_dependencies" {
   }
 
   triggers = {
-    # runs_always = "${timestamp()}" // executes every time because timestamp changes
-    dir_node_modules    = local.node_modules_sha1
-    packageJSON_sha1    = local.packageJSON_sha1
+    runs_always = "${timestamp()}" // executes every time because timestamp changes
+    # dir_node_modules    = local.website_node_modules_sha1
+    # packageJSON_sha1    = local.website_packageJSON_sha1
   }
 }
 
@@ -89,10 +89,10 @@ resource "null_resource" "build_app" {
   }
 
   triggers = {
-    #runs_always = "${timestamp()}" // executes every time because timestamp changes
-    dir_sha1    = local.dir_sha1
-    dir_public_sha1    = local.dir_public_sha1
-    dir_node_modules    = local.node_modules_sha1
+    runs_always = "${timestamp()}" // executes every time because timestamp changes
+    # dir_sha1    = local.website_dir_sha1
+    # dir_public_sha1    = local.website_dir_public_sha1
+    # dir_node_modules    = local.website_node_modules_sha1
   }
 }
 
@@ -105,6 +105,6 @@ resource "null_resource" "remove_and_upload_to_s3" {
     command = "aws s3 sync ${var.out_path} s3://${aws_s3_bucket.website.id}"
   }
   triggers = {
-    dir_dist_sha1 = local.dir_dist_sha1
+    runs_always = "${timestamp()}"
   }
 }

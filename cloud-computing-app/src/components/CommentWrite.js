@@ -1,5 +1,5 @@
 /* eslint-disable import/no-anonymous-default-export */
-import React, { useContext, useState, useEffect } from 'react';
+import React, {  useState } from 'react';
 import '../css/PostView.css'
 import GetAxiosInstance from "../logic/axios.instance";
 
@@ -19,7 +19,6 @@ export default (props) => {
            content: text.trim(),
         };
         const route = routes.comment.post.replace('{post}', post);
-        console.log({route});
         axios.post(route, body)
                 .then(result => {
                     console.log({result});
@@ -28,7 +27,12 @@ export default (props) => {
                 })
                 .catch((err, data) => {
                     console.log({err});
-                    setResponseText(err.message);
+                    console.log({data})
+                    if(err && err.response && err.response.data && err.response.data.message) {
+                        setResponseText(err.response.data.message)
+                    } else {
+                        setResponseText(err.message);
+                    }
                 })
     }
 

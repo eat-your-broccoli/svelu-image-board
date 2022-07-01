@@ -68,7 +68,7 @@ resource "aws_subnet" "rds" {
 }
 
 resource "aws_db_subnet_group" "default" {
-  name        = "svelu-rds-subnet-group_"
+  name        = var.db_subnet_group_name
   description = "Terraform example RDS subnet group"
   subnet_ids  = flatten(["${aws_subnet.rds.*.id}"]) # flatten the nested array caused by .*.id
 }

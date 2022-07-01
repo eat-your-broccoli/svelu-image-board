@@ -1,58 +1,73 @@
 
-locals {
-  packageJSON_sha1  = sha1(join("", [for f in fileset(path.root, "${var.src_path}/package*.json") : filesha1(f)]))
-  node_modules_sha1 = length(fileset(path.root, "${var.src_path}/node_modules/**"))
-  src_dir_sha1 = sha1(join("", [for f in fileset(path.root, "${var.src_path}/src/**") : filesha1(f)]))
-}
+# locals {
+#   packageJSON_sha1  = sha1(join("", [for f in fileset(path.root, "${var.src_path}/package*.json") : filesha1(f)]))
+#   node_modules_sha1 = length(fileset(path.root, "${var.src_path}/node_modules/**"))
+#   src_dir_sha1 = sha1(join("", [for f in fileset(path.root, "${var.src_path}/src/**") : filesha1(f)]))
+# }
 
-// installing dependencies
-resource "null_resource" "lambda_dependencies" {
-  provisioner "local-exec" {
-    command = "cd ${var.src_path} && rm -rf node_modules/sharp && npm install --arch=x64 --platform=linux sharp && npm install"
-    # yeah ... so basically sharp under windows != sharp under linux. so ... either we do this ... or there are no thumbnails :(
-  }
+# // installing dependencies
+# resource "null_resource" "lambda_dependencies" {
+#   provisioner "local-exec" {
+#     command = "cd ${var.src_path} && rm -rf node_modules/sharp && npm install --arch=x64 --platform=linux sharp && npm install"
+#     # yeah ... so basically sharp under windows != sharp under linux. so ... either we do this ... or there are no thumbnails :(
+#   }
 
-  triggers = {
-    # runs_always = "${timestamp()}" // executes every time because timestamp changes
-    packageJSON_sha1  = local.packageJSON_sha1
-    node_modules      = local.node_modules_sha1
-  }
-}
+#   triggers = {
+#     # runs_always = "${timestamp()}" // executes every time because timestamp changes
+#     packageJSON_sha1  = local.packageJSON_sha1
+#     node_modules      = local.node_modules_sha1
+#   }
+# }
 
-# this little fella here aaaaaaaalways runs
-# this means, its hash will always change
-# which means, it will be uploaded on every terraform apply
-# which is something I (Luca) don't like
-# rant continues at null_resource.remove_and_upload_to_s3
-data "archive_file" "archive" {
-  type = "zip"
+# # this little fella here aaaaaaaalways runs
+# # this means, its hash will always change
+# # which means, it will be uploaded on every terraform apply
+# # which is something I (Luca) don't like
+# # rant continues at null_resource.remove_and_upload_to_s3
+# data "archive_file" "archive" {
+#   type = "zip"
 
-  source_dir  = "${var.src_path}"
-  output_path = "${var.out_path}${var.file_key}"
-  excludes = ["test/", ".env", ".env.example", "docker-compose.yml"]
-  depends_on = [
-    null_resource.lambda_dependencies
-  ]
-}
+#   source_dir  = "${var.src_path}"
+#   output_path = "${var.out_path}${var.file_key}"
+#   excludes = ["test/", ".env", ".env.example", "docker-compose.yml"]
+#   depends_on = [
+#     null_resource.lambda_dependencies
+#   ]
+# }
 
-# archive file uploads every time if we'd use aws_s3_object
-# so ... let's use a null resource, and sync the folder of the archive file
-# ONLY when triggers fire
-resource "null_resource" "remove_and_upload_to_s3" {
-  depends_on = [
-    data.archive_file.archive
-  ]
-  provisioner "local-exec" {
-    command = "aws s3 sync ${var.out_path} s3://${var.bucket_id}"
-  }
-  triggers = {
-    packageJSON_sha1 = local.packageJSON_sha1
-    node_modules_sha1 = local.node_modules_sha1
-    src_dir_sha1 = local.src_dir_sha1
-  }
-}
+# # archive file uploads every time if we'd use aws_s3_object
+# # so ... let's use a null resource, and sync the folder of the archive file
+# # ONLY when triggers fire
+# resource "null_resource" "remove_and_upload_to_s3" {
+#   depends_on = [
+#     data.archive_file.archive
+#   ]
+#   provisioner "local-exec" {
+#     command = "ls ${var.out_path} && aws s3 sync ${var.out_path} s3://${var.bucket_id}"
+#   }
+#   triggers = {
+#     packageJSON_sha1 = local.packageJSON_sha1
+#     node_modules_sha1 = local.node_modules_sha1
+#     src_dir_sha1 = local.src_dir_sha1
+#   }
+# }
+
+# data "null_data_source" "wait_for_upload" {
+#   inputs = {
+#     # This ensures that this data resource will not be evaluated until
+#     # after the null_resource has been created.
+#     lambda_exporter_id = "${null_resource.remove_and_upload_to_s3.id}"
+
+#     # This value gives us something to implicitly depend on
+#     # in the archive_file below.
+#     file_key = var.file_key
+#   }
+# }
 
 resource "aws_lambda_function" "lambda_function" {
+  depends_on = [
+    # data.null_data_source.wait_for_upload
+  ]
   for_each = var.lambdas
   function_name = each.value.function_name
 
@@ -64,7 +79,7 @@ resource "aws_lambda_function" "lambda_function" {
 
   timeout = each.value.timeout
 
-  source_code_hash = data.archive_file.archive.output_base64sha256
+  source_code_hash = var.archive_hash
 
   role = aws_iam_role.lambda_exec.arn
 
